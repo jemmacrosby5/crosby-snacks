@@ -3,6 +3,7 @@ import cors from "cors";
 import user from "./routes/user.js";
 import score from "./routes/score.js";
 import country from "./routes/country.js";
+import "./db/connection.js";
 
 const PORT = process.env.PORT || 5050;
 const app = express();
