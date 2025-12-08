@@ -11,6 +11,6 @@ The winning country is the score with the highest difference between low and hig
 - Deployed on Render
 
 ## Basic Initial Requirements
-- Login/Sign up page
+- Login page
 - Voting page (behind auth)
 - Homepage showing leaderboard
