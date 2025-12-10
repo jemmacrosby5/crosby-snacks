@@ -1,4 +1,10 @@
-export default async function CountryPage({ params }) {
+interface CountryPageProps {
+  params: {
+    id: string;
+  };
+}
+
+export default async function CountryPage({ params }: CountryPageProps) {
     const { id } = await params;
   
     const backendUrl = process.env.BACKEND_URL;
