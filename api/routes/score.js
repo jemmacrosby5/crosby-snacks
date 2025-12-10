@@ -7,13 +7,18 @@ const router = express.Router();
 router.get("/country/:countryId", async (req, res) => {
   try {
     const { countryId } = req.params;
-    const scores = await Score.find({ countryId });
+
+    const scores = await Score.find({ countryId })
+      .populate("userId", "username email")
+      .populate("countryId", "name code");
+
     res.status(200).json(scores);
   } catch (err) {
     console.error("Error fetching scores for country:", err);
     res.status(500).json({ error: "Error fetching scores for country" });
   }
 });
+
 
 // Get all scores by a specific user
 router.get("/user/:userId", async (req, res) => {
@@ -64,8 +69,8 @@ router.get("/average", async (req, res) => {
         }
       },
 
-      // Sort highest avgHighScore first
-      { $sort: { avgHighScore: -1 } }
+      // Sort highest avgDifference first
+      { $sort: { avgDifference: -1 } }
     ]);
 
     res.status(200).json(results);
