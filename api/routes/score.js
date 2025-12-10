@@ -27,6 +27,32 @@ router.get("/user/:userId", async (req, res) => {
   }
 });
 
+// Get average scores grouped by country
+router.get("/average", async (req, res) => {
+  try {
+    const results = await Score.aggregate([
+      {
+        $group: {
+          _id: "$countryId",
+          avgHighScore: { $avg: "$highScore" },
+          avgLowScore: { $avg: "$lowScore" },
+          avgDifference: { $avg: { $subtract: ["$highScore", "$lowScore"] } },
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $sort: { avgHighScore: -1 }
+      }
+    ]);
+
+    res.status(200).json(results);
+  } catch (err) {
+    console.error("Error grouping scores:", err);
+    res.status(500).json({ error: "Error grouping scores" });
+  }
+});
+
+
 // Submit a new score
 router.post("/", async (req, res) => {
   try {
