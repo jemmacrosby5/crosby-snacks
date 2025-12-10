@@ -76,7 +76,6 @@ router.get("/average", async (req, res) => {
 });
 
 
-
 // Submit a new score
 router.post("/", async (req, res) => {
   try {
