@@ -41,8 +41,31 @@ router.get("/average", async (req, res) => {
         }
       },
       {
-        $sort: { avgHighScore: -1 }
-      }
+        $lookup: {
+          from: "countries",
+          localField: "_id",
+          foreignField: "_id", 
+          as: "country"
+        }
+      },
+
+      { $unwind: "$country" },
+
+      {
+        $project: {
+          _id: 0,
+          countryId: "$_id",
+          countryName: "$country.name",
+          countryCode: "$country.code",
+          avgHighScore: 1,
+          avgLowScore: 1,
+          avgDifference: 1,
+          count: 1
+        }
+      },
+
+      // Sort highest avgHighScore first
+      { $sort: { avgHighScore: -1 } }
     ]);
 
     res.status(200).json(results);
@@ -51,6 +74,7 @@ router.get("/average", async (req, res) => {
     res.status(500).json({ error: "Error grouping scores" });
   }
 });
+
 
 
 // Submit a new score
