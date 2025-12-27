@@ -1,18 +1,19 @@
 import Link from "next/link";
 
-type Score = {
-  countryId: string;
-  countryName: string;
-  countryCode: string;
-  avgHighScore: number;
-  avgLowScore: number;
-  avgDifference: number;
-};
+// type Score = {
+//   countryId: string;
+//   countryName: string;
+//   countryCode: string;
+//   avgHighScore: number;
+//   avgLowScore: number;
+//   avgDifference: number;
+// };
 
 export default async function Leaderboard() {
   const backendUrl = process.env.BACKEND_URL;
+  console.log(backendUrl)
 
-  let scores: Score[] = [];
+  let scores= [];
 
   if (!backendUrl) {
     console.error("BACKEND_URL is not defined");
@@ -21,10 +22,10 @@ export default async function Leaderboard() {
       const res = await fetch(`${backendUrl}/score/average`, {
         cache: "no-store",
       });
-
       if (!res.ok) throw new Error("Failed to fetch leaderboard");
 
-      scores = (await res.json()) as Score[];
+      scores = (await res.json());
+      console.log(scores)
     } catch (error) {
       console.error("Error fetching scores:", error);
     }

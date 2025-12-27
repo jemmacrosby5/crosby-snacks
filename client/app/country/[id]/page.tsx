@@ -5,7 +5,7 @@ interface CountryPageProps {
 }
 
 export default async function CountryPage({ params }: CountryPageProps) {
-    const { id } = await params;
+    const { id } = params;
   
     const backendUrl = process.env.BACKEND_URL;
     let scores = [];
