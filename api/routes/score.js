@@ -3,23 +3,6 @@ import Score from "../models/score.js";
 
 const router = express.Router();
 
-// Get all scores for a specific country
-router.get("/country/:countryId", async (req, res) => {
-  try {
-    const { countryId } = req.params;
-
-    const scores = await Score.find({ countryId })
-      .populate("userId", "username email")
-      .populate("countryId", "name code");
-
-    res.status(200).json(scores);
-  } catch (err) {
-    console.error("Error fetching scores for country:", err);
-    res.status(500).json({ error: "Error fetching scores for country" });
-  }
-});
-
-
 // Get all scores by a specific user
 router.get("/user/:userId", async (req, res) => {
   try {
@@ -32,13 +15,13 @@ router.get("/user/:userId", async (req, res) => {
   }
 });
 
-// Get average scores grouped by country
+// Get average scores grouped by trip
 router.get("/average", async (req, res) => {
   try {
     const results = await Score.aggregate([
       {
         $group: {
-          _id: "$countryId",
+          _id: "$tripId",
           avgHighScore: { $avg: "$highScore" },
           avgLowScore: { $avg: "$lowScore" },
           avgDifference: { $avg: { $subtract: ["$highScore", "$lowScore"] } },
@@ -47,19 +30,28 @@ router.get("/average", async (req, res) => {
       },
       {
         $lookup: {
-          from: "countries",
+          from: "trips",
           localField: "_id",
-          foreignField: "_id", 
+          foreignField: "_id",
+          as: "trip"
+        }
+      },
+      { $unwind: "$trip" },
+      {
+        $lookup: {
+          from: "countries",
+          localField: "trip.countryId",
+          foreignField: "_id",
           as: "country"
         }
       },
-
       { $unwind: "$country" },
-
       {
         $project: {
           _id: 0,
-          countryId: "$_id",
+          tripId: "$_id",
+          tripName: "$trip.name",
+          countryId: "$country._id",
           countryName: "$country.name",
           countryCode: "$country.code",
           avgHighScore: 1,
@@ -68,8 +60,6 @@ router.get("/average", async (req, res) => {
           count: 1
         }
       },
-
-      // Sort highest avgDifference first
       { $sort: { avgDifference: -1 } }
     ]);
 
@@ -81,18 +71,18 @@ router.get("/average", async (req, res) => {
 });
 
 
-// Submit a new score
+// Submit a new score (must reference a trip)
 router.post("/", async (req, res) => {
   try {
-    const { userId, countryId, highScore, lowScore } = req.body;
+    const { userId, tripId, highScore, lowScore } = req.body;
 
-    if (!userId || !countryId || highScore == null || lowScore == null) {
+    if (!userId || !tripId || highScore == null || lowScore == null) {
       return res.status(400).json({ error: "All fields are required" });
     }
 
     const newScore = new Score({
       userId,
-      countryId,
+      tripId,
       highScore,
       lowScore,
     });
