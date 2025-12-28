@@ -15,26 +15,33 @@ router.get("/user/:userId", async (req, res) => {
   }
 });
 
-// Get average scores grouped by trip
-router.get("/average", async (req, res) => {
+
+/**
+ * GET /leaderboard
+ * Returns leaderboard entries grouped by trip with:
+ *  - tripId, description, date
+ *  - country { name, code }
+ *  - participants [{ _id, name, picUrl }]
+ *  - avgHigh (number), avgLow (number), scoreCount
+ */
+router.get("/leaderboard", async (req, res) => {
   try {
-    const results = await Score.aggregate([
+    const pipeline = [
       {
         $group: {
           _id: "$tripId",
-          avgHighScore: { $avg: "$highScore" },
-          avgLowScore: { $avg: "$lowScore" },
-          avgDifference: { $avg: { $subtract: ["$highScore", "$lowScore"] } },
-          count: { $sum: 1 }
-        }
+          avgHigh: { $avg: "$highScore" },
+          avgLow: { $avg: "$lowScore" },
+          scoreCount: { $sum: 1 },
+        },
       },
       {
         $lookup: {
           from: "trips",
           localField: "_id",
           foreignField: "_id",
-          as: "trip"
-        }
+          as: "trip",
+        },
       },
       { $unwind: "$trip" },
       {
@@ -42,34 +49,46 @@ router.get("/average", async (req, res) => {
           from: "countries",
           localField: "trip.countryId",
           foreignField: "_id",
-          as: "country"
-        }
+          as: "country",
+        },
       },
-      { $unwind: "$country" },
+      { $unwind: { path: "$country", preserveNullAndEmptyArrays: true } },
+      {
+        $lookup: {
+          from: "users",
+          localField: "trip.participants",
+          foreignField: "_id",
+          as: "participants",
+        },
+      },
       {
         $project: {
-          _id: 0,
           tripId: "$_id",
-          tripName: "$trip.name",
-          countryId: "$country._id",
-          countryName: "$country.name",
-          countryCode: "$country.code",
-          avgHighScore: 1,
-          avgLowScore: 1,
-          avgDifference: 1,
-          count: 1
-        }
+          description: "$trip.description",
+          date: "$trip.date",
+          country: { name: "$country.name", code: "$country.code" },
+          participants: {
+            $map: {
+              input: "$participants",
+              as: "p",
+              in: { _id: "$$p._id", name: "$$p.name", picUrl: "$$p.picUrl" },
+            },
+          },
+          avgHigh: { $round: ["$avgHigh", 2] },
+          avgLow: { $round: ["$avgLow", 2] },
+          scoreCount: 1,
+        },
       },
-      { $sort: { avgDifference: -1 } }
-    ]);
+      { $sort: { avgHigh: -1, avgLow: -1 } },
+    ];
 
+    const results = await Score.aggregate(pipeline);
     res.status(200).json(results);
   } catch (err) {
-    console.error("Error grouping scores:", err);
-    res.status(500).json({ error: "Error grouping scores" });
+    console.error("Error building leaderboard:", err);
+    res.status(500).json({ error: "Error building leaderboard" });
   }
-});
-
+})
 
 // Submit a new score (must reference a trip)
 router.post("/", async (req, res) => {

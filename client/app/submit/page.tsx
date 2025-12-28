@@ -13,6 +13,7 @@ export default async function Page() {
   }
  
   const { userId } = await auth()
+  console.log("Authenticated userId:", userId)
 
   return (
     <div>
