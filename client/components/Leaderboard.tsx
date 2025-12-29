@@ -1,4 +1,6 @@
 import Link from "next/link";
+import ProfilePicture from "./ProfilePicture";
+import { parseDecimal } from "../utils/functions"
 
 type LeaderboardEntry = {
   _id?: string;
@@ -11,12 +13,6 @@ type LeaderboardEntry = {
   avgLow?: any;
 };
 
-function parseDecimal(v: any) {
-  if (v && typeof v === "object" && "$numberDecimal" in v) {
-    return parseFloat(v.$numberDecimal);
-  }
-  return typeof v === "string" ? parseFloat(v) : Number(v || 0);
-}
 
 export default async function Leaderboard() {
   const backendUrl = process.env.BACKEND_URL;
@@ -75,12 +71,7 @@ export default async function Leaderboard() {
                       {entry.participants?.map((p) => (
                         <div key={p._id}>
                         <p>{p.name}</p>
-                        <img
-                          src={p.picUrl ?? "/avatar-placeholder.png"}
-                          alt={p.name}
-                          title={p.name}
-                          className="w-7 h-7 rounded-full border"
-                        />
+                        <ProfilePicture picUrl={p.picUrl} name={p.name}/>
                         </div>
                       ))}
                     </div>

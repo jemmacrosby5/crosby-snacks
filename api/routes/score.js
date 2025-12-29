@@ -3,6 +3,67 @@ import Score from "../models/score.js";
 
 const router = express.Router();
 
+const leaderboardPipeline = [
+  {
+    $group: {
+      _id: "$tripId",
+      avgHigh: { $avg: "$highScore" },
+      avgLow: { $avg: "$lowScore" },
+      scoreCount: { $sum: 1 },
+    },
+  },
+  {
+    $lookup: {
+      from: "trips",
+      localField: "_id",
+      foreignField: "_id",
+      as: "trip",
+    },
+  },
+  { $unwind: "$trip" },
+  {
+    $lookup: {
+      from: "countries",
+      localField: "trip.countryId",
+      foreignField: "_id",
+      as: "country",
+    },
+  },
+  { $unwind: { path: "$country", preserveNullAndEmptyArrays: true } },
+  {
+    $lookup: {
+      from: "users",
+      localField: "trip.participants",
+      foreignField: "_id",
+      as: "participants",
+    },
+  },
+  {
+    $project: {
+      tripId: "$_id",
+      description: "$trip.description",
+      date: "$trip.date",
+      country: { name: "$country.name", code: "$country.code" },
+      participants: {
+        $map: {
+          input: "$participants",
+          as: "p",
+          in: {
+            _id: "$$p._id",
+            name: "$$p.name",
+            picUrl: "$$p.picUrl",
+          },
+        },
+      },
+      avgHigh: { $round: ["$avgHigh", 2] },
+      avgLow: { $round: ["$avgLow", 2] },
+      diff: { $round: [{ $subtract: ["$avgHigh", "$avgLow"] }, 2] },
+      scoreCount: 1,
+    },
+  },
+  { $sort: { diff: -1 } },
+];
+
 // Get all scores by a specific user
 router.get("/user/:userId", async (req, res) => {
   try {
@@ -15,80 +76,37 @@ router.get("/user/:userId", async (req, res) => {
   }
 });
 
-
 /**
  * GET /leaderboard
- * Returns leaderboard entries grouped by trip with:
- *  - tripId, description, date
- *  - country { name, code }
- *  - participants [{ _id, name, picUrl }]
- *  - avgHigh (number), avgLow (number), scoreCount
+ * Returns top 5 trips by score diff
  */
 router.get("/leaderboard", async (req, res) => {
   try {
-    const pipeline = [
-      {
-        $group: {
-          _id: "$tripId",
-          avgHigh: { $avg: "$highScore" },
-          avgLow: { $avg: "$lowScore" },
-          scoreCount: { $sum: 1 },
-        },
-      },
-      {
-        $lookup: {
-          from: "trips",
-          localField: "_id",
-          foreignField: "_id",
-          as: "trip",
-        },
-      },
-      { $unwind: "$trip" },
-      {
-        $lookup: {
-          from: "countries",
-          localField: "trip.countryId",
-          foreignField: "_id",
-          as: "country",
-        },
-      },
-      { $unwind: { path: "$country", preserveNullAndEmptyArrays: true } },
-      {
-        $lookup: {
-          from: "users",
-          localField: "trip.participants",
-          foreignField: "_id",
-          as: "participants",
-        },
-      },
-      {
-        $project: {
-          tripId: "$_id",
-          description: "$trip.description",
-          date: "$trip.date",
-          country: { name: "$country.name", code: "$country.code" },
-          participants: {
-            $map: {
-              input: "$participants",
-              as: "p",
-              in: { _id: "$$p._id", name: "$$p.name", picUrl: "$$p.picUrl" },
-            },
-          },
-          avgHigh: { $round: ["$avgHigh", 2] },
-          avgLow: { $round: ["$avgLow", 2] },
-          scoreCount: 1,
-        },
-      },
-      { $sort: { avgHigh: -1, avgLow: -1 } },
-    ];
+    const results = await Score.aggregate([
+      ...leaderboardPipeline,
+      { $limit: 5 },
+    ]);
 
-    const results = await Score.aggregate(pipeline);
     res.status(200).json(results);
   } catch (err) {
     console.error("Error building leaderboard:", err);
     res.status(500).json({ error: "Error building leaderboard" });
   }
-})
+});
+
+/**
+ * GET /all/sorted
+ * Returns all trips sorted by score diff
+ */
+router.get("/all/sorted", async (req, res) => {
+  try {
+    const results = await Score.aggregate(leaderboardPipeline);
+    res.status(200).json(results);
+  } catch (err) {
+    console.error("Error fetching sorted scores:", err);
+    res.status(500).json({ error: "Error fetching sorted scores" });
+  }
+});
 
 // Submit a new score (must reference a trip)
 router.post("/", async (req, res) => {
