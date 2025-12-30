@@ -1,22 +1,19 @@
-import { apiFetch, parseDecimal } from "@/utils/functions";
-import Link from "next/link";
-import ProfilePicture from "../../components/ProfilePicture";
-import {LeaderboardEntry} from "@/utils/types"
-
+import { apiFetch, parseDecimal } from '@/utils/functions';
+import Link from 'next/link';
+import ProfilePicture from '../../components/ProfilePicture';
+import { LeaderboardEntry } from '@/utils/types';
 
 const TripHomePage = async () => {
+  const trips: LeaderboardEntry[] = await apiFetch(`/score/all/sorted`);
 
-    const trips: LeaderboardEntry[] = await apiFetch(`/score/all/sorted`);
-
-
-    return(
-        <div>
-        <h2 className="text-3xl font-bold p-4">All Trips</h2>
-        <div className="flex flex-col gap-4 p-6">
+  return (
+    <div>
+      <h2 className="text-3xl font-bold p-4">All Trips</h2>
+      <div className="flex flex-col gap-4 p-6">
         {trips.map((entry: LeaderboardEntry) => {
           const id = entry.tripId ?? entry._id;
-          const countryName = entry.country?.name ?? "Unknown";
-          const countryCode = (entry.country?.code).toLowerCase() ?? "";
+          const countryName = entry.country?.name ?? 'Unknown';
+          const countryCode = (entry.country?.code).toLowerCase() ?? '';
           const avgHigh = parseDecimal(entry.avgHigh);
           const avgLow = parseDecimal(entry.avgLow);
           const avgDiff = avgHigh - avgLow;
@@ -32,43 +29,35 @@ const TripHomePage = async () => {
                   />
 
                   <div className="flex flex-col">
-                    <span className="text-lg font-semibold">
-                      {countryName}
-                    </span>
+                    <span className="text-lg font-semibold">{countryName}</span>
                     <span className="text-sm text-gray-500">
-                      {entry.date ? new Date(entry.date).toLocaleDateString() : ""}
+                      {entry.date ? new Date(entry.date).toLocaleDateString() : ''}
                     </span>
                   </div>
-                    <div className="flex items-center gap-2 mt-2">
-                      {entry.participants?.map((p) => (
-                        <div key={p._id}>
+                  <div className="flex items-center gap-2 mt-2">
+                    {entry.participants?.map((p) => (
+                      <div key={p._id}>
                         <p>{p.name}</p>
-                        <ProfilePicture picUrl={p.picUrl} name={p.name}/>
-                        </div>
-                      ))}
-                    </div>
+                        <ProfilePicture picUrl={p.picUrl} name={p.name} />
+                      </div>
+                    ))}
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-3 gap-6 text-right">
                   <div>
                     <p className="text-sm text-gray-500">Avg High</p>
-                    <p className="font-bold">
-                      {isNaN(avgHigh) ? "-" : avgHigh.toFixed(2)}
-                    </p>
+                    <p className="font-bold">{isNaN(avgHigh) ? '-' : avgHigh.toFixed(2)}</p>
                   </div>
 
                   <div>
                     <p className="text-sm text-gray-500">Avg Low</p>
-                    <p className="font-bold">
-                      {isNaN(avgLow) ? "-" : avgLow.toFixed(2)}
-                    </p>
+                    <p className="font-bold">{isNaN(avgLow) ? '-' : avgLow.toFixed(2)}</p>
                   </div>
 
                   <div>
                     <p className="text-sm text-gray-500">Diff</p>
-                    <p className="font-bold">
-                      {isNaN(avgDiff) ? "-" : avgDiff.toFixed(2)}
-                    </p>
+                    <p className="font-bold">{isNaN(avgDiff) ? '-' : avgDiff.toFixed(2)}</p>
                   </div>
                 </div>
               </div>
@@ -78,6 +67,6 @@ const TripHomePage = async () => {
       </div>
     </div>
   );
-}
+};
 
 export default TripHomePage;

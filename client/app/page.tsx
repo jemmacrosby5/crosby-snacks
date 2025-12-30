@@ -1,10 +1,10 @@
-import Leaderboard from "../components/Leaderboard";
-import Link from "next/link";
+import Leaderboard from '../components/Leaderboard';
+import Link from 'next/link';
 
 export default async function Home() {
   return (
     <>
-      <Leaderboard/>
+      <Leaderboard />
       <Link href="/trip">View all trips</Link>
     </>
   );

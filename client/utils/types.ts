@@ -41,7 +41,6 @@ export type LeaderboardEntry = {
   diff: MongoDecimal;
 };
 
-
 export interface UserSummary {
   _id: string;
   name: string;
@@ -61,4 +60,3 @@ export interface Score {
   highScore: number;
   lowScore: number;
 }
-
