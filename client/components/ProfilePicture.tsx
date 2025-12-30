@@ -1,12 +1,12 @@
 interface Props {
-  picUrl?: string;
+  picUrl?: string | null;
   name?: string;
 }
 
-const ProfilePicture = ({ picUrl, name }: Props) => {
+export function ProfilePicture({ picUrl, name }: Props) {
   const validUrl = picUrl?.includes('https://');
 
-  if (validUrl) {
+  if (picUrl && validUrl) {
     return (
       <img
         src={picUrl}
@@ -24,6 +24,4 @@ const ProfilePicture = ({ picUrl, name }: Props) => {
       </div>
     );
   }
-};
-
-export default ProfilePicture;
+}

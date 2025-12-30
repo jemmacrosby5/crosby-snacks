@@ -1,6 +1,6 @@
 import { apiFetch, parseDecimal } from '@/utils/functions';
 import Link from 'next/link';
-import ProfilePicture from '../../components/ProfilePicture';
+import { ProfilePicture } from '../../components/ProfilePicture';
 import { LeaderboardEntry } from '@/utils/types';
 
 const TripHomePage = async () => {

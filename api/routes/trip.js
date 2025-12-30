@@ -16,37 +16,76 @@ router.get("/", async (req, res) => {
       }
 });
 
-// Get details of a specific trip
+
 router.get("/:tripId", async (req, res) => {
   try {
     const { tripId } = req.params;
 
+    // 1️⃣ Fetch trip details
     const trip = await Trip.findById(tripId)
       .populate("participants", "name picUrl")
       .populate("countryId", "name code")
       .lean();
-    res.status(200).json(trip);
+
+    if (!trip) {
+      return res.status(404).json({ error: "Trip not found" });
+    }
+
+    // 2️⃣ Fetch scores
+    const rawScores = await Score.find({ tripId })
+      .populate("userId", "name picUrl")
+      .lean();
+
+    // 3️⃣ Normalize scores (Decimal128 -> number)
+    const scores = rawScores.map((score) => ({
+      ...score,
+      highScore:
+        score.highScore != null
+          ? Number(score.highScore)
+          : null,
+      lowScore:
+        score.lowScore != null
+          ? Number(score.lowScore)
+          : null,
+    }));
+
+    // 4️⃣ Calculate averages
+    const validScores = scores.filter(
+      (s) => typeof s.highScore === "number" && typeof s.lowScore === "number"
+    );
+
+    let avgHigh = null;
+    let avgLow = null;
+    let diff = null;
+
+    if (validScores.length > 0) {
+      const totalHigh = validScores.reduce((sum, s) => sum + s.highScore, 0);
+      const totalLow = validScores.reduce((sum, s) => sum + s.lowScore, 0);
+
+      avgHigh = Number((totalHigh / validScores.length).toFixed(2));
+      avgLow = Number((totalLow / validScores.length).toFixed(2));
+      diff = Number((avgHigh - avgLow).toFixed(2));
+    }
+
+    // 5️⃣ Send response
+    res.status(200).json({
+      trip,
+      scores,
+      averages: {
+        avgHigh,
+        avgLow,
+        diff,
+      },
+    });
   } catch (err) {
-    console.error("Error fetching details for trip:", err);
-    res.status(500).json({ error: "Error fetching details for trip" });
+    console.error("Error fetching trip details:", err);
+    res.status(500).json({ error: "Error fetching trip details" });
   }
 });
 
-// Get all scores for a specific trip
-router.get("/:tripId/scores", async (req, res) => {
-  try {
-    const { tripId } = req.params;
 
-    const scores = await Score.find({ tripId })
-      .populate("userId", "id name picUrl")
-      .populate("tripId", "name countryId date");
 
-    res.status(200).json(scores);
-  } catch (err) {
-    console.error("Error fetching scores for trip:", err);
-    res.status(500).json({ error: "Error fetching scores for trip" });
-  }
-});
+
 
 router.post("/", async (req, res) => {
   try {
