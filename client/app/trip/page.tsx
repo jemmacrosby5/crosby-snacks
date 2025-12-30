@@ -11,8 +11,8 @@ const TripHomePage = async () => {
 
     return(
         <div>
-        <h2 className="text-3xl font-bold m-6">All Trips</h2>
-<div className="flex flex-col gap-4">
+        <h2 className="text-3xl font-bold p-4">All Trips</h2>
+        <div className="flex flex-col gap-4 p-6">
         {trips.map((entry: LeaderboardEntry) => {
           const id = entry.tripId ?? entry._id;
           const countryName = entry.country?.name ?? "Unknown";

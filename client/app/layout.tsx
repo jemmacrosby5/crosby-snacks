@@ -31,8 +31,11 @@ export default function RootLayout({
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      > <Header />
-        {children}
+      > 
+        <Header />
+          <div className="min-h-screen bg-linear-to-br from-slate-50 via-slate-100 to-slate-200 px-8 py-2">
+            {children}
+          </div>
       </body>
     </html>
     </ClerkProvider>

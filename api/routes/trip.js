@@ -38,7 +38,7 @@ router.get("/:tripId/scores", async (req, res) => {
     const { tripId } = req.params;
 
     const scores = await Score.find({ tripId })
-      .populate("userId", "id name")
+      .populate("userId", "id name picUrl")
       .populate("tripId", "name countryId date");
 
     res.status(200).json(scores);

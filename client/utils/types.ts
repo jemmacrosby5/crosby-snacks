@@ -40,3 +40,25 @@ export type LeaderboardEntry = {
   avgLow: MongoDecimal;
   diff: MongoDecimal;
 };
+
+
+export interface UserSummary {
+  _id: string;
+  name: string;
+  picUrl: string;
+}
+
+export interface TripSummary {
+  _id: string;
+  countryId: string;
+  date: string;
+}
+
+export interface Score {
+  _id: string;
+  userId: UserSummary;
+  tripId: TripSummary;
+  highScore: number;
+  lowScore: number;
+}
+
