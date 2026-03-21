@@ -1,16 +1,34 @@
-import { apiFetch, parseDecimal } from '@/utils/functions';
 import Link from 'next/link';
-import { ProfilePicture } from '../../components/ProfilePicture';
-import { LeaderboardEntry } from '@/utils/types';
+import { ProfilePicture } from './ProfilePicture';
+import { parseDecimal } from '../utils/functions';
+import { getLeaderBoard} from '../db/queries'
 
-const TripHomePage = async () => {
-  const trips: LeaderboardEntry[] = await apiFetch(`/score/all/sorted`);
+interface LeaderboardEntry {
+  _id?: number;
+  tripId?: number;
+  country: { name: string; code: string };
+  date?: Date;
+  participants?: { id: string; name: string; picUrl?: string | null }[];
+  avgHigh?: number;
+  avgLow?: number;
+  avgDiff?: number;
+};
+
+export default async function Leaderboard() {
+  let scores: LeaderboardEntry[] = [];
+
+  scores = await getLeaderBoard()
+  console.log(scores)
+
 
   return (
-    <div>
-      <h2 className="text-3xl font-bold p-4">All Trips</h2>
-      <div className="flex flex-col gap-4 p-6">
-        {trips.map((entry: LeaderboardEntry) => {
+    <div className="max-w-3xl mx-auto p-6">
+      <h2 className="text-3xl font-bold mb-6 text-center">Leaderboard</h2>
+
+      {scores.length === 0 && <p className="text-gray-500 text-center">No scores available.</p>}
+
+      <div className="flex flex-col gap-4">
+        {scores.map((entry) => {
           const id = entry.tripId ?? entry._id;
           const countryName = entry.country?.name ?? 'Unknown';
           const countryCode = (entry.country?.code).toLowerCase() ?? '';
@@ -67,6 +85,4 @@ const TripHomePage = async () => {
       </div>
     </div>
   );
-};
-
-export default TripHomePage;
+}
