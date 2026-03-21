@@ -1,7 +1,7 @@
 'use client';
-import React, { useState, useEffect } from 'react';
-import ProfilePicture from './ProfilePicture';
-import { Country, User } from '@/utils/types';
+import React, { useState } from 'react';
+import {ProfilePicture} from '@components/ProfilePicture';
+import { Country, User } from '@utils/types';
 
 type Props = {
   countries: Country[];
@@ -41,7 +41,7 @@ export default function NewTripForm({ countries, users }: Props) {
           >
             <option value="">Select a country</option>
             {countries.map((c) => (
-              <option key={c.code} value={c._id}>
+              <option key={c.code} value={c.id}>
                 {c.name}
               </option>
             ))}
@@ -75,13 +75,13 @@ export default function NewTripForm({ countries, users }: Props) {
           </p>
           <div className="flex flex-wrap gap-4">
             {users.map((user) => {
-              const isSelected = selectedParticipants.includes(user._id);
+              const isSelected = selectedParticipants.includes(user.id);
 
               return (
                 <button
-                  key={user._id}
+                  key={user.id}
                   type="button"
-                  onClick={() => updateParticipants(user._id)}
+                  onClick={() => updateParticipants(user.id)}
                   className={`shadow rounded p-4 flex flex-col items-center gap-2 hover:cursor-pointer w-20 ${
                     isSelected ? 'bg-blue-600 text-white' : 'bg-white text-black'
                   }`}

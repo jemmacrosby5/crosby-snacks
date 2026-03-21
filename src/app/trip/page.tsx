@@ -12,7 +12,7 @@ const TripHomePage = async () => {
       <h2 className="text-3xl font-bold p-4">All Trips</h2>
       <div className="flex flex-col gap-4 p-6">
         {trips.map((entry: LeaderboardEntry) => {
-          const id = entry.tripId ?? entry._id;
+          const id = entry.tripId
           const countryName = entry.country?.name ?? 'Unknown';
           const countryCode = (entry.country?.code).toLowerCase() ?? '';
           const avgHigh = parseDecimal(entry.avgHigh);
@@ -37,7 +37,7 @@ const TripHomePage = async () => {
                   </div>
                   <div className="flex items-center gap-2 mt-2">
                     {entry.participants?.map((p) => (
-                      <div key={p._id}>
+                      <div key={p.id}>
                         <p>{p.name}</p>
                         <ProfilePicture picUrl={p.picUrl} name={p.name} />
                       </div>

@@ -1,18 +1,8 @@
 import Link from 'next/link';
-import { ProfilePicture } from './ProfilePicture';
-import { parseDecimal } from '../utils/functions';
-import { getLeaderBoard} from '../db/queries'
-
-interface LeaderboardEntry {
-  _id?: number;
-  tripId?: number;
-  country: { name: string; code: string };
-  date?: Date;
-  participants?: { id: string; name: string; picUrl?: string | null }[];
-  avgHigh?: number;
-  avgLow?: number;
-  avgDiff?: number;
-};
+import { ProfilePicture } from '@components/ProfilePicture';
+import { parseDecimal } from '@utils/functions';
+import { getLeaderBoard} from '@db/queries'
+import {LeaderboardEntry} from '@utils/types' 
 
 export default async function Leaderboard() {
   let scores: LeaderboardEntry[] = [];
@@ -29,7 +19,7 @@ export default async function Leaderboard() {
 
       <div className="flex flex-col gap-4">
         {scores.map((entry) => {
-          const id = entry.tripId ?? entry._id;
+          const id = entry.tripId
           const countryName = entry.country?.name ?? 'Unknown';
           const countryCode = (entry.country?.code).toLowerCase() ?? '';
           const avgHigh = parseDecimal(entry.avgHigh);
@@ -54,7 +44,7 @@ export default async function Leaderboard() {
                   </div>
                   <div className="flex items-center gap-2 mt-2">
                     {entry.participants?.map((p) => (
-                      <div key={p._id}>
+                      <div key={p.id}>
                         <p>{p.name}</p>
                         <ProfilePicture picUrl={p.picUrl} name={p.name} />
                       </div>

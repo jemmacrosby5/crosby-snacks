@@ -1,5 +1,5 @@
-import { Score } from '@/utils/types';
-import { ProfilePicture } from '@/components/ProfilePicture';
+import { Score } from '@utils/types';
+import { ProfilePicture } from '@components/ProfilePicture';
 
 type Props = {
   score: Score;
