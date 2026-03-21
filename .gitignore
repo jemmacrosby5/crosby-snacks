@@ -22,6 +22,9 @@ yarn-error.log*
 # env files
 .env*
 
+# clerk configuration
+.clerk/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
