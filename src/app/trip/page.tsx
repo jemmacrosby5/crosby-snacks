@@ -1,44 +1,17 @@
+import { parseDecimal } from '@utils/functions';
 import Link from 'next/link';
-import ProfilePicture from './ProfilePicture';
-import { parseDecimal } from '../utils/functions';
+import { ProfilePicture } from '@components/ProfilePicture';
+import { LeaderboardEntry } from '@/utils/types';
+import { getLeaderBoard} from '@db/queries'
 
-type LeaderboardEntry = {
-  _id?: string;
-  tripId?: string;
-  scoreCount: number;
-  country: { name: string; code: string };
-  date?: string;
-  participants?: { _id: string; name: string; picUrl?: string }[];
-  avgHigh?: any;
-  avgLow?: any;
-};
-
-export default async function Leaderboard() {
-  const backendUrl = process.env.BACKEND_URL;
-  let scores: LeaderboardEntry[] = [];
-
-  if (!backendUrl) {
-    console.error('BACKEND_URL is not defined');
-  } else {
-    try {
-      const res = await fetch(`${backendUrl}/score/leaderboard`, {
-        cache: 'no-store',
-      });
-      if (!res.ok) throw new Error('Failed to fetch leaderboard');
-      scores = await res.json();
-    } catch (error) {
-      console.error('Error fetching scores:', error);
-    }
-  }
+const TripHomePage = async () => {
+  const trips: LeaderboardEntry[] = await getLeaderBoard();
 
   return (
-    <div className="max-w-3xl mx-auto p-6">
-      <h2 className="text-3xl font-bold mb-6 text-center">Leaderboard</h2>
-
-      {scores.length === 0 && <p className="text-gray-500 text-center">No scores available.</p>}
-
-      <div className="flex flex-col gap-4">
-        {scores.map((entry) => {
+    <div>
+      <h2 className="text-3xl font-bold p-4">All Trips</h2>
+      <div className="flex flex-col gap-4 p-6">
+        {trips.map((entry: LeaderboardEntry) => {
           const id = entry.tripId ?? entry._id;
           const countryName = entry.country?.name ?? 'Unknown';
           const countryCode = (entry.country?.code).toLowerCase() ?? '';
@@ -95,4 +68,6 @@ export default async function Leaderboard() {
       </div>
     </div>
   );
-}
+};
+
+export default TripHomePage;

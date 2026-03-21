@@ -6,6 +6,7 @@ export default async function Home() {
     <>
       <Leaderboard />
       <Link href="/trip">View all trips</Link>
+      <Link href="/rules">View the rules</Link>
     </>
   );
 }
