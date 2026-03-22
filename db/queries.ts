@@ -42,68 +42,78 @@ export async function getUserTrips(userId: string) {
  * - participants: { id: string; name: string; picUrl?: string }[];
  */
 export async function getLeaderBoard() {
-  const leaderboard = await db
-    .select({
-      tripId: trips.id,
-      date: trips.date,
-      description: trips.description,
+  try{
 
-      countryName: countries.name,
-      countryCode: countries.code,
-
-      avgHigh: avg(scores.highScore),
-      avgLow: avg(scores.lowScore),
-
-      scoreDiff: sql<number>`
-        AVG(${scores.highScore}) - AVG(${scores.lowScore})
-      `,
-    })
-    .from(trips)
-    .innerJoin(countries, eq(trips.countryId, countries.id))
-    .innerJoin(scores, eq(scores.tripId, trips.id))
-    .groupBy(
-      trips.id,
-      trips.date,
-      trips.description,
-      countries.name,
-      countries.code
+    const leaderboard = await db
+      .select({
+        tripId: trips.id,
+        date: trips.date,
+        description: trips.description,
+  
+        countryName: countries.name,
+        countryCode: countries.code,
+        countryTwoLetterCode: countries.twoLetterCode,
+  
+        avgHigh: avg(scores.highScore),
+        avgLow: avg(scores.lowScore),
+  
+        scoreDiff: sql<number>`
+          AVG(${scores.highScore}) - AVG(${scores.lowScore})
+        `,
+      })
+      .from(trips)
+      .innerJoin(countries, eq(trips.countryId, countries.id))
+      .innerJoin(scores, eq(scores.tripId, trips.id))
+      .groupBy(
+        trips.id,
+        trips.date,
+        trips.description,
+        countries.name,
+        countries.code,
+        countries.twoLetterCode
+      )
+      .orderBy(
+        desc(sql`AVG(${scores.highScore}) - AVG(${scores.lowScore})`)
+      )
+  
+    return await Promise.all(
+      leaderboard.map(async (trip) => {
+        const participants = await db
+          .select({
+            id: users.id,
+            name: users.name,
+            picUrl: users.pictureUrl,
+          })
+          .from(tripParticipants)
+          .innerJoin(users, eq(tripParticipants.userId, users.id))
+          .where(eq(tripParticipants.tripId, trip.tripId))
+  
+        const avgHigh = Number(trip.avgHigh);
+        const avgLow = Number(trip.avgLow);
+        const avgDiff = avgHigh - avgLow;
+  
+        return {
+          tripId: trip.tripId,
+          date: trip.date,
+          description: trip.description,
+          country: {
+            name: trip.countryName,
+            code: trip.countryCode,
+            twoLetterCode: trip.countryTwoLetterCode,
+          },
+          avgHigh,
+          avgLow,
+          avgDiff,
+          scoreCount: participants.length,
+          participants,
+        }
+      })
     )
-    .orderBy(
-      desc(sql`AVG(${scores.highScore}) - AVG(${scores.lowScore})`)
-    )
+  }
+  catch (error) {
+    console.error('Failed to fetch users:', error)
+    return []
+  }
 
-  const result = await Promise.all(
-    leaderboard.map(async (trip) => {
-      const participants = await db
-        .select({
-          id: users.id,
-          name: users.name,
-          picUrl: users.pictureUrl,
-        })
-        .from(tripParticipants)
-        .innerJoin(users, eq(tripParticipants.userId, users.id))
-        .where(eq(tripParticipants.tripId, trip.tripId))
 
-      const avgHigh = Number(trip.avgHigh);
-      const avgLow = Number(trip.avgLow);
-      const avgDiff = avgHigh - avgLow;
-
-      return {
-        tripId: trip.tripId,
-        date: trip.date,
-        description: trip.description,
-        country: {
-          name: trip.countryName,
-          code: trip.countryCode,
-        },
-        avgHigh,
-        avgLow,
-        avgDiff,
-        scoreCount: participants.length,
-        participants,
-      }
-    })
-  )
-
-  return result
 }

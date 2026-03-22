@@ -3,6 +3,7 @@ export type Country = {
   id: number;
   code: string;
   name: string;
+  twoLetterCode: string;
 };
 
 // export type User = {
@@ -12,23 +13,12 @@ export type Country = {
 //   clerkId: string;
 // };
 
-// Edited in fetch types
-export type MongoDecimal = {
-  $numberDecimal: string;
-};
-
-
-export type LeaderboardCountry = {
-  name: string;
-  code: string;
-};
-
 export type LeaderboardEntry = {
   tripId: number;
   description: string | null;
   date: Date;
   scoreCount: number;
-  country: LeaderboardCountry;
+  country: Country;
   participants: User[];
   avgHigh: number;
   avgLow: number;

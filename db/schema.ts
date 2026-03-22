@@ -9,7 +9,8 @@ export const users = pgTable("users", {
 export const countries = pgTable("countries", {
   id: integer().primaryKey(),
   name: text().notNull().unique(),
-  code: text().notNull().unique()
+  code: text().notNull().unique(),
+  twoLetterCode: text('code_two_letter').notNull().unique(),
 });
 
 export const trips = pgTable("trips", {
