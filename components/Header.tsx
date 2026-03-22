@@ -17,12 +17,12 @@ export default function Header() {
       <SignedOut>
         <div className="flex justify-between gap-2">
           <SignInButton>
-            <button className="bg-blue-300 rounded-full font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 cursor-pointer">
+            <button className="bg-slate-600 rounded-full font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 cursor-pointer">
               Login
             </button>
           </SignInButton>
           <SignUpButton>
-            <button className="bg-blue-300 rounded-full font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 cursor-pointer">
+            <button className="bg-slate-600 rounded-full font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 cursor-pointer">
               Register
             </button>
           </SignUpButton>
@@ -30,10 +30,10 @@ export default function Header() {
       </SignedOut>
       <SignedIn>
         <div className="flex gap-4">
-          <Link href="/submit/trip" className="cursor-pointer bg-blue-500 text-white p-2 rounded">
+          <Link href="/submit/trip" className="cursor-pointer bg-slate-600 text-white p-2 rounded">
             Create Trip
           </Link>
-          <Link href="/submit/score" className="cursor-pointer bg-blue-500 text-white p-2 rounded">
+          <Link href="/submit/score" className="cursor-pointer bg-slate-600 text-white p-2 rounded">
             Submit Score
           </Link>
           <UserButton />

@@ -5,7 +5,12 @@ import { avg, sql, desc, eq, count } from 'drizzle-orm'
 
 // Get Users
 export async function getAllUsers() {
-  return await db.select().from(users)
+  try{
+    return await db.select().from(users)
+  }catch (error){
+    console.error('Failed to fetch users:', error)
+    return []
+  }
 }
 
 export async function getUserById(id: string) {
