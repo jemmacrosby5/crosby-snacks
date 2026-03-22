@@ -20,13 +20,10 @@ export default async function Leaderboard({ limit }: LeaderboardProps) {
   }
 
   return (
-    <div className="max-w-3xl mx-auto p-6">
-      <h2 className="text-3xl font-bold mb-6 text-center">Leaderboard</h2>
-
+    <div className="max-w-3xl mx-auto">
       {scores.length === 0 && <p className="text-gray-500 text-center">No scores available.</p>}
 
       <div className="flex flex-col gap-2">
-
         {scores.map((entry, index) => {
           return (
             <Link href={`/trip/${entry.tripId}`} key={entry.tripId}>

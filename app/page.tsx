@@ -10,12 +10,18 @@ export default async function Home() {
         <p className="font-bold text-2xl">
           Rating snacks from <span className="text-green-800">around the world.</span>
         </p>
-        <StatBoxes/>
+        <StatBoxes />
       </section>
 
-      <Leaderboard limit={5}/>
-      <Link href="/trip">View all trips</Link>
-      <Link href="/rules">View the rules</Link>
+      <section className="flex flex-col gap-4 items-center mt-10">
+        <h2 className="text-3xl font-bold text-center">Leaderboard</h2>
+        <p>The current top 5 trips are:</p>
+        <Leaderboard limit={5} />
+        <div className="flex gap-2">
+          <Link className="bg-slate-600 rounded-md w-fit p-4 text-white" href="/trip">View all trips</Link>
+          <Link className="bg-slate-600 rounded-md w-fit p-4 text-white" href="/rules">View the rules</Link>
+        </div>
+      </section>
     </>
   );
 }

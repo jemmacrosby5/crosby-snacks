@@ -52,18 +52,7 @@ export async function getStatCounts(): Promise<{ trips: number; countries: numbe
 
 }
 
-/**
- * Returns leaderboard data for trips:
- * - tripId: string;
- * - date: Date;
- * - description?: string;
- * - country: { name: string; code: string };
- * - avgHigh: number;
- * - avgLow: number;
- * - avgDiff: number;
- * - scoreCount: number;
- * - participants: { id: string; name: string; picUrl?: string }[];
- */
+
 export async function getLeaderBoard() {
   try {
     const leaderboard = await db

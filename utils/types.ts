@@ -6,7 +6,7 @@ export interface Country {
 };
 
 export interface CountryTrimmed {
-    name: string;
+  name: string;
   code: string;
   twoLetterCode: string;
 }
@@ -41,4 +41,12 @@ export interface Score {
   tripId: TripSummary;
   highScore: number;
   lowScore: number;
+}
+
+export interface BasicTrip {
+  id: number;
+  date: Date;
+  description: string;
+  country: CountryTrimmed,
+  participants: User[]
 }

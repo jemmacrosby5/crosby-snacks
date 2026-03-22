@@ -30,10 +30,10 @@ export default function Header() {
       </SignedOut>
       <SignedIn>
         <div className="flex gap-4">
-          <Link href="/submit/trip" className="cursor-hover bg-blue-500 text-white p-2 rounded">
+          <Link href="/submit/trip" className="cursor-pointer bg-blue-500 text-white p-2 rounded">
             Create Trip
           </Link>
-          <Link href="/submit/score" className="cursor-hover bg-blue-500 text-white p-2 rounded">
+          <Link href="/submit/score" className="cursor-pointer bg-blue-500 text-white p-2 rounded">
             Submit Score
           </Link>
           <UserButton />
