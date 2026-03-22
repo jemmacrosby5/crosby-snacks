@@ -1,9 +1,33 @@
 {
+  "name": "crosby-snacks",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "format": "prettier --write ."
+  },
   "dependencies": {
+    "@clerk/nextjs": "^6.36.2",
     "drizzle-orm": "^0.45.1",
-    "postgres": "^3.4.8"
+    "next": "^16.0.7",
+    "postgres": "^3.4.8",
+    "react": "19.2.0",
+    "react-dom": "19.2.0"
   },
   "devDependencies": {
-    "drizzle-kit": "^0.31.10"
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "baseline-browser-mapping": "^2.10.9",
+    "drizzle-kit": "^0.31.10",
+    "eslint": "^9",
+    "eslint-config-next": "16.0.0",
+    "prettier": "^3.7.4",
+    "tailwindcss": "^4",
+    "typescript": "^5"
   }
 }
