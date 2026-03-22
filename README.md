@@ -6,9 +6,10 @@ a rating for the country's selection out of 10 for the low and the high rating i
 The winning country is the score with the highest difference between low and high.
 
 ## Infrastructure
-- MERN app
+- Supabase Backend
+- Drizzle ORM
 - Tailwind
-- Deployed on Render
+- Deployed on Vercel
 
 ## Basic Initial Requirements
 - Login page
