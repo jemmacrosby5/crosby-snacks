@@ -1,24 +1,22 @@
-// Raw types
-export type Country = {
+export interface Country {
   id: number;
-  code: string;
   name: string;
+  code: string;
   twoLetterCode: string;
 };
 
-// export type User = {
-//   _id: string;
-//   name: string;
-//   picUrl: string;
-//   clerkId: string;
-// };
+export interface CountryTrimmed {
+    name: string;
+  code: string;
+  twoLetterCode: string;
+}
 
-export type LeaderboardEntry = {
+export interface LeaderboardEntry {
   tripId: number;
   description: string | null;
   date: Date;
   scoreCount: number;
-  country: Country;
+  country: CountryTrimmed;
   participants: User[];
   avgHigh: number;
   avgLow: number;

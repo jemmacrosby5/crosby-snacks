@@ -1,6 +1,6 @@
 import { db } from '@/db'
 import { users, trips, tripParticipants, scores, countries } from '@/db/schema'
-import { avg, sql, desc, eq } from 'drizzle-orm'
+import { avg, sql, desc, eq, count } from 'drizzle-orm'
 
 
 // Get Users
@@ -29,6 +29,29 @@ export async function getUserTrips(userId: string) {
     .where(eq(tripParticipants.userId, userId))
 }
 
+// Get a counts for homepage display
+export async function getStatCounts(): Promise<{ trips: number; countries: number; users: number; scores: number }> {
+  try {
+    const tripsCount = await db.select({ count: count() }).from(trips);
+    const uniqueCountriesCount = await db.select({ count: sql<number>`count(distinct ${trips.countryId})` }).from(trips);
+    const usersCount = await db.select({ count: count() }).from(users);
+    const scoreCount = await db.select({ count: count() }).from(scores);
+
+    return {
+      trips: Number(tripsCount[0].count),
+      countries: Number(uniqueCountriesCount[0].count),
+      users: Number(usersCount[0].count),
+      scores: Number(scoreCount[0].count),
+    };
+  } catch (error) {
+    console.error('Failed to fetch stats:', error)
+    return { trips: 0, countries: 0, users: 0, scores: 0 }
+  }
+
+
+
+}
+
 /**
  * Returns leaderboard data for trips:
  * - tripId: string;
@@ -42,21 +65,20 @@ export async function getUserTrips(userId: string) {
  * - participants: { id: string; name: string; picUrl?: string }[];
  */
 export async function getLeaderBoard() {
-  try{
-
+  try {
     const leaderboard = await db
       .select({
         tripId: trips.id,
         date: trips.date,
         description: trips.description,
-  
+
         countryName: countries.name,
         countryCode: countries.code,
         countryTwoLetterCode: countries.twoLetterCode,
-  
+
         avgHigh: avg(scores.highScore),
         avgLow: avg(scores.lowScore),
-  
+
         scoreDiff: sql<number>`
           AVG(${scores.highScore}) - AVG(${scores.lowScore})
         `,
@@ -75,7 +97,7 @@ export async function getLeaderBoard() {
       .orderBy(
         desc(sql`AVG(${scores.highScore}) - AVG(${scores.lowScore})`)
       )
-  
+
     return await Promise.all(
       leaderboard.map(async (trip) => {
         const participants = await db
@@ -87,11 +109,11 @@ export async function getLeaderBoard() {
           .from(tripParticipants)
           .innerJoin(users, eq(tripParticipants.userId, users.id))
           .where(eq(tripParticipants.tripId, trip.tripId))
-  
+
         const avgHigh = Number(trip.avgHigh);
         const avgLow = Number(trip.avgLow);
         const avgDiff = avgHigh - avgLow;
-  
+
         return {
           tripId: trip.tripId,
           date: trip.date,

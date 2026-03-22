@@ -8,8 +8,6 @@ export default async function Leaderboard() {
   let scores: LeaderboardEntry[] = [];
 
   scores = await getLeaderBoard()
-  console.log(scores)
-
 
   return (
     <div className="max-w-3xl mx-auto p-6">
@@ -19,10 +17,8 @@ export default async function Leaderboard() {
 
       <div className="flex flex-col gap-4">
         {scores.map((entry) => {
-          console.log(entry.participants)
-          const id = entry.tripId
           return (
-            <Link href={`/trip/${id}`} key={id}>
+            <Link href={`/trip/${entry.tripId}`} key={entry.tripId}>
               <div className="bg-white shadow-md rounded-2xl p-5 flex items-center justify-between border border-gray-100 hover:shadow-lg transition cursor-pointer">
                 <div className="flex items-center space-x-4">
                   <img

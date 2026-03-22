@@ -1,12 +1,16 @@
 import { SignInButton, SignUpButton, SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
+import { Icon } from '@components/Icon'
 import Link from 'next/link';
 
 export default function Header() {
   return (
     <header className="w-full px-6 py-4 flex items-center justify-between bg-white shadow">
       {/* Left: Title */}
-      <Link href="/" className="text-xl font-semibold">
-        Crosby Snacks
+      <Link href="/" className="text-xl font-semibold flex items-center gap-2">
+        <div className="rounded-full bg-slate-600 p-1">
+          <Icon name="cookie" size={40} className="text-white" />
+        </div>
+        <span>Crosby Snacks</span>
       </Link>
 
       {/* Right: Buttons */}
