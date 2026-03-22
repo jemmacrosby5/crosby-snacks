@@ -13,7 +13,7 @@ export default async function Home() {
         <StatBoxes/>
       </section>
 
-      <Leaderboard />
+      <Leaderboard limit={5}/>
       <Link href="/trip">View all trips</Link>
       <Link href="/rules">View the rules</Link>
     </>
