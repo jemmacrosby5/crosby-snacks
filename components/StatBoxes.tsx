@@ -15,7 +15,7 @@ export default async function StatBoxes() {
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
       {statItems.map((item) => (
-        <div key={item.key} className="rounded-lg border border-slate-600 flex flex-col items-center gap-2 p-4 md:p-8 bg-white">
+        <div key={item.key} className="rounded-lg border border-slate-600 flex flex-col items-center gap-2 p-8 bg-white">
           <div className="bg-slate-600 p-1 rounded-full w-fit">
             <Icon name={item.icon} className="text-white" />
           </div>

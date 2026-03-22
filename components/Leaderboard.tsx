@@ -1,8 +1,9 @@
 import Link from 'next/link';
+import Score from '@components/Score'
 import { ProfilePicture } from '@components/ProfilePicture';
-import { parseDecimal } from '@utils/functions';
 import { getLeaderBoard } from '@db/queries'
 import { LeaderboardEntry } from '@utils/types'
+import { Icon } from './Icon';
 
 interface LeaderboardProps {
   limit?: number;
@@ -13,6 +14,7 @@ export default async function Leaderboard({ limit }: LeaderboardProps) {
 
   scores = await getLeaderBoard()
 
+  // Temp logic to filter to 5, once we've done more trips this logic should be server side
   if (limit) {
     scores = scores.slice(0, limit);
   }
@@ -24,18 +26,12 @@ export default async function Leaderboard({ limit }: LeaderboardProps) {
       {scores.length === 0 && <p className="text-gray-500 text-center">No scores available.</p>}
 
       <div className="flex flex-col gap-2">
-        <div className="bg-slate-300 font-bold rounded-xl p-3 grid gap-4 items-center" style={{ gridTemplateColumns: '60px 1.5fr 1.5fr 1fr 1fr' }}>
-          <p>Rank</p>
-          <p>Trip</p>
-          <p>People</p>
-          <p>Scores(High/Low)</p>
-          <p>Difference</p>
-        </div>
 
         {scores.map((entry, index) => {
           return (
             <Link href={`/trip/${entry.tripId}`} key={entry.tripId}>
-              <div className="bg-white shadow-md rounded-2xl px-4 py-8 grid gap-4 items-center border border-gray-100 hover:shadow-lg transition cursor-pointer" style={{ gridTemplateColumns: '60px 1.5fr 1.5fr 1fr 1fr' }}>
+              {/* Desktop Layout */}
+              <div className="bg-white shadow-md hidden rounded-2xl px-4 py-8 md:grid gap-4 items-center border border-gray-100 hover:shadow-lg transition cursor-pointer" style={{ gridTemplateColumns: '60px 1.5fr 1.5fr 1fr 1fr' }}>
                 {/* Rank */}
                 <div className="flex justify-center">
                   <div className="rounded-full bg-slate-700 w-8 h-8 text-white text-center flex items-center justify-center">
@@ -70,13 +66,58 @@ export default async function Leaderboard({ limit }: LeaderboardProps) {
                 </div>
 
                 {/* Scores */}
-                <div className="text-center">
-                  <p className="font-bold">{entry?.avgHigh.toFixed(2)} / {entry?.avgLow?.toFixed(2)}</p>
-                </div>
+                <Score highScore={entry?.avgHigh} lowScore={entry?.avgLow} />
 
                 {/* Difference */}
                 <div className="text-center">
-                  <p className="font-bold">{entry?.avgDiff.toFixed(2)}</p>
+                  <p className="font-bold text-lg">{entry?.avgDiff.toFixed(2)}</p>
+                </div>
+              </div>
+
+
+              {/* Mobile Layout */}
+              <div className="bg-white shadow-md flex rounded-2xl p-4 md:hidden gap-4 items-center border border-gray-100 hover:shadow-lg transition cursor-pointer">
+                <div className="flex w-full items-center justify-between">
+                  <div className="flex items-start gap-4">
+                    {/* Rank */}
+                    <div className="flex justify-center">
+                      <div className="rounded-full bg-slate-700 w-8 h-8 text-white text-center flex items-center justify-center">
+                        {index + 1}
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                      {/* Trip Info */}
+                      <div className="flex flex-col gap-1">
+                        <div className="flex items-center gap-2">
+                          <img
+                            src={`https://flagcdn.com/${entry?.country?.twoLetterCode}.svg`}
+                            alt={`${entry?.country?.name} flag`}
+                            className="w-8 h-5 rounded-sm shadow-md border border-gray-200 object-cover"
+                          />
+                          <span className="text-lg font-semibold ">{entry?.country?.name}</span>
+                        </div>
+
+
+                        <span className="text-sm text-gray-500">
+                          {entry?.date ? new Date(entry?.date).toLocaleDateString('en-GB') : ''}
+                        </span>
+                      </div>
+
+                      {/* People */}
+                      <div className="flex items-center gap-2">
+                        <Icon name="users"/>
+                        <p className="text-sm text-gray-600">
+                          {entry?.participants?.map(person => person.name).join(', ')}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Scores */}
+                    <div className="text-center mr-2">
+                      <p className="font-bold text-xl">{entry?.avgDiff.toFixed(2)}</p>
+                    </div>
                 </div>
               </div>
             </Link>
