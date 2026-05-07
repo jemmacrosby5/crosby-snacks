@@ -4,6 +4,7 @@ import './globals.css';
 import { ClerkProvider } from '@clerk/nextjs';
 
 import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -32,6 +33,7 @@ export default function RootLayout({
           <div className="min-h-screen bg-linear-to-br from-slate-50 via-slate-100 to-slate-200 px-4 md:px-8 lg:px-16 py-2 items-center text-center">
             {children}
           </div>
+          <Footer/>
         </body>
       </html>
     </ClerkProvider>
