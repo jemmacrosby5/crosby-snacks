@@ -118,14 +118,14 @@ export const icons = {
       />
     </>
   ),
-  clipboard: (
+  tick: (
     <>
       <rect width="256" height="256" fill="none" />
       <polyline
         points="88 136 112 160 168 104"
         fill="none"
         stroke="currentColor"
-        stroke-linecap="round"
+       stroke-linecap="round"
         stroke-linejoin="round"
         stroke-width="16"
       />

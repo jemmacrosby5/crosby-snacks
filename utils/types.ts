@@ -26,7 +26,7 @@ export interface LeaderboardEntry {
 export interface User{
   id: string;
   name: string;
-  pictureUrl: string | null;
+  picUrl: string | null;
 }
 
 export interface TripSummary {

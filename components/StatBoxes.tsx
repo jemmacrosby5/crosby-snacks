@@ -9,7 +9,7 @@ export default async function StatBoxes() {
     { key: 'trips', label: 'Trips', icon: 'plane' },
     { key: 'countries', label: 'Countries', icon: 'globe' },
     { key: 'users', label: 'Users', icon: 'users' },
-    { key: 'scores', label: 'Scores', icon: 'clipboard' },
+    { key: 'scores', label: 'Scores', icon: 'tick' },
   ] as const
 
   return (

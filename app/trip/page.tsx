@@ -1,10 +1,6 @@
-import { LeaderboardEntry } from '@utils/types';
-import { getLeaderBoard } from '@db/queries'
 import Leaderboard from '@components/Leaderboard'
 
 const TripHomePage = async () => {
-  const allTrips: LeaderboardEntry[] = await getLeaderBoard()
-
   return (
     <>
       <h1 className="font-bold text-2xl my-6">All Trips</h1>
