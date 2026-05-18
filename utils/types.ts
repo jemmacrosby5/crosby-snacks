@@ -1,44 +1,32 @@
-// Raw types
-export type Country = {
+export interface Country {
   id: number;
-  code: string;
-  name: string;
-};
-
-// export type User = {
-//   _id: string;
-//   name: string;
-//   picUrl: string;
-//   clerkId: string;
-// };
-
-// Edited in fetch types
-export type MongoDecimal = {
-  $numberDecimal: string;
-};
-
-
-export type LeaderboardCountry = {
   name: string;
   code: string;
-};
+  twoLetterCode: string;
+}
 
-export type LeaderboardEntry = {
+export interface CountryTrimmed {
+  name: string;
+  code: string;
+  twoLetterCode: string;
+}
+
+export interface LeaderboardEntry {
   tripId: number;
   description: string | null;
   date: Date;
   scoreCount: number;
-  country: LeaderboardCountry;
+  country: CountryTrimmed;
   participants: User[];
   avgHigh: number;
   avgLow: number;
   avgDiff: number;
-};
+}
 
-export interface User{
+export interface User {
   id: string;
   name: string;
-  picUrl: string | null;
+  pictureUrl: string | null;
 }
 
 export interface TripSummary {
@@ -53,4 +41,12 @@ export interface Score {
   tripId: TripSummary;
   highScore: number;
   lowScore: number;
+}
+
+export interface BasicTrip {
+  id: number;
+  date: Date;
+  description: string;
+  country: CountryTrimmed;
+  participants: User[];
 }

@@ -1,17 +1,17 @@
-import { Score } from '@utils/types';
 import { ProfilePicture } from '@components/ProfilePicture';
 
 type Props = {
-  score: Score;
+  score: any; // to fix
 };
 
 export function ScoreCard({ score }: Props) {
   const user = score.userId;
+
   return (
     <div className="shadow rounded p-4 flex flex-col gap-2">
       <div className="flex items-center gap-2">
-        <ProfilePicture picUrl={user.picUrl} name={user.name} />
-        <p className="text-lg font-medium">{user.name}</p>
+        <ProfilePicture picUrl={user.picUrl} name={score.userName} />
+        <p className="text-lg font-medium">{score.userName}</p>
       </div>
 
       <div className="grid grid-cols-2 bg-gray-100 rounded divide-x divide-gray-300 p-2 justify-between">

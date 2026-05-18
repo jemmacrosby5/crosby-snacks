@@ -1,20 +1,24 @@
-import { db } from '@/db'
-import { users, trips, tripParticipants, scores, countries } from '@/db/schema'
-import { avg, sql, desc, eq } from 'drizzle-orm'
-
+import { db } from '@/db';
+import { users, trips, tripParticipants, scores, countries } from '@/db/schema';
+import { avg, sql, desc, eq, count } from 'drizzle-orm';
 
 // Get Users
 export async function getAllUsers() {
-  return await db.select().from(users)
+  try {
+    return await db.select().from(users);
+  } catch (error) {
+    console.error('Failed to fetch users:', error);
+    return [];
+  }
 }
 
 export async function getUserById(id: string) {
-  return await db.select().from(users).where(eq(users.id, id))
+  return await db.select().from(users).where(eq(users.id, id));
 }
 
 // Get countries
 export async function getAllCountries() {
-  return await db.select().from(countries)
+  return await db.select().from(countries);
 }
 
 // Get a users trip details
@@ -26,84 +30,213 @@ export async function getUserTrips(userId: string) {
     })
     .from(tripParticipants)
     .innerJoin(trips, eq(tripParticipants.tripId, trips.id))
-    .where(eq(tripParticipants.userId, userId))
+    .where(eq(tripParticipants.userId, userId));
 }
 
-/**
- * Returns leaderboard data for trips:
- * - tripId: string;
- * - date: Date;
- * - description?: string;
- * - country: { name: string; code: string };
- * - avgHigh: number;
- * - avgLow: number;
- * - avgDiff: number;
- * - scoreCount: number;
- * - participants: { id: string; name: string; picUrl?: string }[];
- */
+// Get a counts for homepage display
+export async function getStatCounts(): Promise<{
+  trips: number;
+  countries: number;
+  users: number;
+  scores: number;
+}> {
+  try {
+    const tripsCount = await db.select({ count: count() }).from(trips);
+    const uniqueCountriesCount = await db
+      .select({ count: sql<number>`count(distinct ${trips.countryId})` })
+      .from(trips);
+    const usersCount = await db.select({ count: count() }).from(users);
+    const scoreCount = await db.select({ count: count() }).from(scores);
+
+    return {
+      trips: Number(tripsCount[0].count),
+      countries: Number(uniqueCountriesCount[0].count),
+      users: Number(usersCount[0].count),
+      scores: Number(scoreCount[0].count),
+    };
+  } catch (error) {
+    console.error('Failed to fetch stats:', error);
+    return { trips: 0, countries: 0, users: 0, scores: 0 };
+  }
+}
+
 export async function getLeaderBoard() {
-  const leaderboard = await db
-    .select({
-      tripId: trips.id,
-      date: trips.date,
-      description: trips.description,
+  try {
+    const leaderboard = await db
+      .select({
+        tripId: trips.id,
+        date: trips.date,
+        description: trips.description,
 
-      countryName: countries.name,
-      countryCode: countries.code,
+        countryName: countries.name,
+        countryCode: countries.code,
+        countryTwoLetterCode: countries.twoLetterCode,
 
-      avgHigh: avg(scores.highScore),
-      avgLow: avg(scores.lowScore),
+        avgHigh: avg(scores.highScore),
+        avgLow: avg(scores.lowScore),
 
-      scoreDiff: sql<number>`
-        AVG(${scores.highScore}) - AVG(${scores.lowScore})
-      `,
-    })
-    .from(trips)
-    .innerJoin(countries, eq(trips.countryId, countries.id))
-    .innerJoin(scores, eq(scores.tripId, trips.id))
-    .groupBy(
-      trips.id,
-      trips.date,
-      trips.description,
-      countries.name,
-      countries.code
-    )
-    .orderBy(
-      desc(sql`AVG(${scores.highScore}) - AVG(${scores.lowScore})`)
-    )
+        scoreDiff: sql<number>`
+          AVG(${scores.highScore}) - AVG(${scores.lowScore})
+        `,
+      })
+      .from(trips)
+      .innerJoin(countries, eq(trips.countryId, countries.id))
+      .innerJoin(scores, eq(scores.tripId, trips.id))
+      .groupBy(
+        trips.id,
+        trips.date,
+        trips.description,
+        countries.name,
+        countries.code,
+        countries.twoLetterCode
+      )
+      .orderBy(desc(sql`AVG(${scores.highScore}) - AVG(${scores.lowScore})`));
 
-  const result = await Promise.all(
-    leaderboard.map(async (trip) => {
-      const participants = await db
-        .select({
-          id: users.id,
-          name: users.name,
-          picUrl: users.pictureUrl,
-        })
-        .from(tripParticipants)
-        .innerJoin(users, eq(tripParticipants.userId, users.id))
-        .where(eq(tripParticipants.tripId, trip.tripId))
+    return await Promise.all(
+      leaderboard.map(async (trip) => {
+        const participants = await db
+          .select({
+            id: users.id,
+            name: users.name,
+            pictureUrl: users.pictureUrl,
+          })
+          .from(tripParticipants)
+          .innerJoin(users, eq(tripParticipants.userId, users.id))
+          .where(eq(tripParticipants.tripId, trip.tripId));
 
-      const avgHigh = Number(trip.avgHigh);
-      const avgLow = Number(trip.avgLow);
-      const avgDiff = avgHigh - avgLow;
+        const avgHigh = Number(trip.avgHigh);
+        const avgLow = Number(trip.avgLow);
+        const avgDiff = avgHigh - avgLow;
 
-      return {
-        tripId: trip.tripId,
-        date: trip.date,
-        description: trip.description,
-        country: {
-          name: trip.countryName,
-          code: trip.countryCode,
-        },
-        avgHigh,
-        avgLow,
-        avgDiff,
-        scoreCount: participants.length,
-        participants,
-      }
-    })
-  )
+        return {
+          tripId: trip.tripId,
+          date: trip.date,
+          description: trip.description,
+          country: {
+            name: trip.countryName,
+            code: trip.countryCode,
+            twoLetterCode: trip.countryTwoLetterCode,
+          },
+          avgHigh,
+          avgLow,
+          avgDiff,
+          scoreCount: participants.length,
+          participants,
+        };
+      })
+    );
+  } catch (error) {
+    console.error('Failed to fetch users:', error);
+    return [];
+  }
+}
 
-  return result
+// export const trips = pgTable("trips", {
+//   id: integer().primaryKey().generatedAlwaysAsIdentity(),
+//   createdAt: timestamp('created_at').notNull(),
+//   countryId: integer('country_id').notNull().references(() => countries.id),
+//   date: timestamp().notNull(),
+//   description: text()
+// });
+
+// export const tripParticipants = pgTable("trip_participants", {
+//   id: integer().primaryKey().generatedAlwaysAsIdentity(),
+//   tripId: integer('trip_id').notNull().references(() => trips.id),
+//   userId: uuid('user_id').notNull().references(() => users.id)
+// });
+
+// export const scores = pgTable("scores", {
+//   id: integer().primaryKey().generatedAlwaysAsIdentity(),
+//   tripId: integer('trip_id').notNull().references(() => trips.id),
+//   userId: uuid('user_id').notNull().references(() => users.id),
+//   highScore: integer('high_score').notNull(),
+//   lowScore: integer('low_score').notNull()
+// });
+
+// Get a specified trip info
+export async function getTripById(id: string) {
+  try {
+    const tripId = parseInt(id);
+
+    // Get trip and country info
+    const tripData = await db
+      .select({
+        id: trips.id,
+        date: trips.date,
+        description: trips.description,
+        countryName: countries.name,
+        countryCode: countries.code,
+        countryTwoLetterCode: countries.twoLetterCode,
+      })
+      .from(trips)
+      .innerJoin(countries, eq(trips.countryId, countries.id))
+      .where(eq(trips.id, tripId));
+
+    if (!tripData.length) {
+      return null;
+    }
+
+    // Get all participants of the trip
+    const participants = await db
+      .select({
+        id: users.id,
+        name: users.name,
+        pictureUrl: users.pictureUrl,
+      })
+      .from(tripParticipants)
+      .innerJoin(users, eq(tripParticipants.userId, users.id))
+      .where(eq(tripParticipants.tripId, tripId));
+
+    // Get all scores for this trip with user info
+    const tripScores = await db
+      .select({
+        id: scores.id,
+        userId: scores.userId,
+        highScore: scores.highScore,
+        lowScore: scores.lowScore,
+        userName: users.name,
+        userPic: users.pictureUrl,
+      })
+      .from(scores)
+      .innerJoin(users, eq(scores.userId, users.id))
+      .where(eq(scores.tripId, tripId));
+
+    const trip = tripData[0];
+    const avgHigh =
+      tripScores.length > 0
+        ? tripScores.reduce((sum, s) => sum + s.highScore, 0) / tripScores.length
+        : 0;
+    const avgLow =
+      tripScores.length > 0
+        ? tripScores.reduce((sum, s) => sum + s.lowScore, 0) / tripScores.length
+        : 0;
+
+    return {
+      tripId: trip.id,
+      date: trip.date,
+      description: trip.description,
+      country: {
+        name: trip.countryName,
+        code: trip.countryCode,
+        twoLetterCode: trip.countryTwoLetterCode,
+      },
+      avgHigh,
+      avgLow,
+      avgDiff: avgHigh - avgLow,
+      participantCount: participants.length,
+      participants,
+      scoreCount: tripScores.length,
+      scores: tripScores.map((score) => ({
+        id: score.id,
+        userId: score.userId,
+        userName: score.userName,
+        userPic: score.userPic,
+        highScore: score.highScore,
+        lowScore: score.lowScore,
+      })),
+    };
+  } catch (error) {
+    console.error('Failed to fetch trip:', error);
+    return null;
+  }
 }
