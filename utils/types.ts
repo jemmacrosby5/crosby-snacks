@@ -3,7 +3,7 @@ export interface Country {
   name: string;
   code: string;
   twoLetterCode: string;
-};
+}
 
 export interface CountryTrimmed {
   name: string;
@@ -21,12 +21,12 @@ export interface LeaderboardEntry {
   avgHigh: number;
   avgLow: number;
   avgDiff: number;
-};
+}
 
-export interface User{
+export interface User {
   id: string;
   name: string;
-  picUrl: string | null;
+  pictureUrl: string | null;
 }
 
 export interface TripSummary {
@@ -47,6 +47,6 @@ export interface BasicTrip {
   id: number;
   date: Date;
   description: string;
-  country: CountryTrimmed,
-  participants: User[]
+  country: CountryTrimmed;
+  participants: User[];
 }

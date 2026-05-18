@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { Icon } from '@/components/Icon';
 import { ScoreCard } from '@/components/ScoreCard';
 import { ProfilePicture } from '@/components/ProfilePicture';
-import { getTripById } from '@db/queries'
+import { getTripById } from '@db/queries';
 
 interface TripPageProps {
   params: Promise<{
@@ -13,10 +13,9 @@ interface TripPageProps {
 const TripPage = async ({ params }: TripPageProps) => {
   const { id } = await params;
 
-  const tripData = await getTripById(id)
+  const tripData = await getTripById(id);
 
-  console.log(tripData)
-
+  console.log(tripData);
 
   return (
     <div className="flex flex-col gap-4">
@@ -42,9 +41,7 @@ const TripPage = async ({ params }: TripPageProps) => {
           </p>
         </div>
 
-        {tripData?.description && (
-          <p className="text-gray-700 mb-2">{tripData.description}</p>
-        )}
+        {tripData?.description && <p className="text-gray-700 mb-2">{tripData.description}</p>}
 
         <div className="border border-gray-100 mb-2" />
 
@@ -53,7 +50,7 @@ const TripPage = async ({ params }: TripPageProps) => {
           <div className="flex flex-wrap gap-2">
             {tripData?.participants?.map((participant) => (
               <div key={participant.id} className="px-4 py-2 text-sm font-medium">
-                <ProfilePicture picUrl={participant.picUrl} name={participant.name} />
+                <ProfilePicture picUrl={participant.pictureUrl} name={participant.name} />
                 {participant.name}
               </div>
             ))}

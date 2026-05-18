@@ -1,8 +1,8 @@
 import Link from 'next/link';
-import Score from '@components/Score'
+import Score from '@components/Score';
 import { ProfilePicture } from '@components/ProfilePicture';
-import { getLeaderBoard } from '@db/queries'
-import { LeaderboardEntry } from '@utils/types'
+import { getLeaderBoard } from '@db/queries';
+import { LeaderboardEntry } from '@utils/types';
 import { Icon } from './Icon';
 
 interface LeaderboardProps {
@@ -12,7 +12,7 @@ interface LeaderboardProps {
 export default async function Leaderboard({ limit }: LeaderboardProps) {
   let scores: LeaderboardEntry[] = [];
 
-  scores = await getLeaderBoard()
+  scores = await getLeaderBoard();
 
   // Temp logic to filter to 5, once we've done more trips this logic should be server side
   if (limit) {
@@ -28,7 +28,10 @@ export default async function Leaderboard({ limit }: LeaderboardProps) {
           return (
             <Link href={`/trip/${entry.tripId}`} key={entry.tripId}>
               {/* Desktop Layout */}
-              <div className="bg-white shadow-md hidden rounded-2xl px-4 py-8 md:grid gap-4 items-center border border-gray-100 hover:shadow-lg transition cursor-pointer" style={{ gridTemplateColumns: '60px 1.5fr 1.5fr 1fr 1fr' }}>
+              <div
+                className="bg-white shadow-md hidden rounded-2xl px-4 py-8 md:grid gap-4 items-center border border-gray-100 hover:shadow-lg transition cursor-pointer"
+                style={{ gridTemplateColumns: '60px 1.5fr 1.5fr 1fr 1fr' }}
+              >
                 {/* Rank */}
                 <div className="flex justify-center">
                   <div className="rounded-full bg-slate-700 w-8 h-8 text-white text-center flex items-center justify-center">
@@ -56,7 +59,7 @@ export default async function Leaderboard({ limit }: LeaderboardProps) {
                 <div className="flex items-center gap-2">
                   {entry?.participants?.map((person) => (
                     <div key={person.id} className="flex flex-col items-center">
-                      <ProfilePicture picUrl={person.picUrl} name={person.name} />
+                      <ProfilePicture picUrl={person.pictureUrl} name={person.name} />
                       <p className="text-xs mt-1">{person.name}</p>
                     </div>
                   ))}
@@ -70,7 +73,6 @@ export default async function Leaderboard({ limit }: LeaderboardProps) {
                   <p className="font-bold text-lg">{entry?.avgDiff.toFixed(2)}</p>
                 </div>
               </div>
-
 
               {/* Mobile Layout */}
               <div className="bg-white shadow-md flex rounded-2xl p-4 md:hidden gap-4 items-center border border-gray-100 hover:shadow-lg transition cursor-pointer">
@@ -95,7 +97,6 @@ export default async function Leaderboard({ limit }: LeaderboardProps) {
                           <span className="text-lg font-semibold ">{entry?.country?.name}</span>
                         </div>
 
-
                         <span className="text-sm text-gray-500">
                           {entry?.date ? new Date(entry?.date).toLocaleDateString('en-GB') : ''}
                         </span>
@@ -103,18 +104,18 @@ export default async function Leaderboard({ limit }: LeaderboardProps) {
 
                       {/* People */}
                       <div className="flex items-center gap-2">
-                        <Icon name="users"/>
+                        <Icon name="users" />
                         <p className="text-sm text-gray-600">
-                          {entry?.participants?.map(person => person.name).join(', ')}
+                          {entry?.participants?.map((person) => person.name).join(', ')}
                         </p>
                       </div>
                     </div>
                   </div>
 
                   {/* Scores */}
-                    <div className="text-center mr-2">
-                      <p className="font-bold text-xl">{entry?.avgDiff.toFixed(2)}</p>
-                    </div>
+                  <div className="text-center mr-2">
+                    <p className="font-bold text-xl">{entry?.avgDiff.toFixed(2)}</p>
+                  </div>
                 </div>
               </div>
             </Link>

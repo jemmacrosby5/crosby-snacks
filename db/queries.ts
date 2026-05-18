@@ -1,25 +1,24 @@
-import { db } from '@/db'
-import { users, trips, tripParticipants, scores, countries } from '@/db/schema'
-import { avg, sql, desc, eq, count } from 'drizzle-orm'
-
+import { db } from '@/db';
+import { users, trips, tripParticipants, scores, countries } from '@/db/schema';
+import { avg, sql, desc, eq, count } from 'drizzle-orm';
 
 // Get Users
 export async function getAllUsers() {
-  try{
-    return await db.select().from(users)
-  }catch (error){
-    console.error('Failed to fetch users:', error)
-    return []
+  try {
+    return await db.select().from(users);
+  } catch (error) {
+    console.error('Failed to fetch users:', error);
+    return [];
   }
 }
 
 export async function getUserById(id: string) {
-  return await db.select().from(users).where(eq(users.id, id))
+  return await db.select().from(users).where(eq(users.id, id));
 }
 
 // Get countries
 export async function getAllCountries() {
-  return await db.select().from(countries)
+  return await db.select().from(countries);
 }
 
 // Get a users trip details
@@ -31,14 +30,21 @@ export async function getUserTrips(userId: string) {
     })
     .from(tripParticipants)
     .innerJoin(trips, eq(tripParticipants.tripId, trips.id))
-    .where(eq(tripParticipants.userId, userId))
+    .where(eq(tripParticipants.userId, userId));
 }
 
 // Get a counts for homepage display
-export async function getStatCounts(): Promise<{ trips: number; countries: number; users: number; scores: number }> {
+export async function getStatCounts(): Promise<{
+  trips: number;
+  countries: number;
+  users: number;
+  scores: number;
+}> {
   try {
     const tripsCount = await db.select({ count: count() }).from(trips);
-    const uniqueCountriesCount = await db.select({ count: sql<number>`count(distinct ${trips.countryId})` }).from(trips);
+    const uniqueCountriesCount = await db
+      .select({ count: sql<number>`count(distinct ${trips.countryId})` })
+      .from(trips);
     const usersCount = await db.select({ count: count() }).from(users);
     const scoreCount = await db.select({ count: count() }).from(scores);
 
@@ -49,11 +55,10 @@ export async function getStatCounts(): Promise<{ trips: number; countries: numbe
       scores: Number(scoreCount[0].count),
     };
   } catch (error) {
-    console.error('Failed to fetch stats:', error)
-    return { trips: 0, countries: 0, users: 0, scores: 0 }
+    console.error('Failed to fetch stats:', error);
+    return { trips: 0, countries: 0, users: 0, scores: 0 };
   }
 }
-
 
 export async function getLeaderBoard() {
   try {
@@ -85,9 +90,7 @@ export async function getLeaderBoard() {
         countries.code,
         countries.twoLetterCode
       )
-      .orderBy(
-        desc(sql`AVG(${scores.highScore}) - AVG(${scores.lowScore})`)
-      )
+      .orderBy(desc(sql`AVG(${scores.highScore}) - AVG(${scores.lowScore})`));
 
     return await Promise.all(
       leaderboard.map(async (trip) => {
@@ -95,11 +98,11 @@ export async function getLeaderBoard() {
           .select({
             id: users.id,
             name: users.name,
-            picUrl: users.pictureUrl,
+            pictureUrl: users.pictureUrl,
           })
           .from(tripParticipants)
           .innerJoin(users, eq(tripParticipants.userId, users.id))
-          .where(eq(tripParticipants.tripId, trip.tripId))
+          .where(eq(tripParticipants.tripId, trip.tripId));
 
         const avgHigh = Number(trip.avgHigh);
         const avgLow = Number(trip.avgLow);
@@ -119,13 +122,12 @@ export async function getLeaderBoard() {
           avgDiff,
           scoreCount: participants.length,
           participants,
-        }
+        };
       })
-    )
-  }
-  catch (error) {
-    console.error('Failed to fetch users:', error)
-    return []
+    );
+  } catch (error) {
+    console.error('Failed to fetch users:', error);
+    return [];
   }
 }
 
@@ -179,7 +181,7 @@ export async function getTripById(id: string) {
       .select({
         id: users.id,
         name: users.name,
-        picUrl: users.pictureUrl,
+        pictureUrl: users.pictureUrl,
       })
       .from(tripParticipants)
       .innerJoin(users, eq(tripParticipants.userId, users.id))
@@ -200,12 +202,14 @@ export async function getTripById(id: string) {
       .where(eq(scores.tripId, tripId));
 
     const trip = tripData[0];
-    const avgHigh = tripScores.length > 0 
-      ? tripScores.reduce((sum, s) => sum + s.highScore, 0) / tripScores.length
-      : 0;
-    const avgLow = tripScores.length > 0
-      ? tripScores.reduce((sum, s) => sum + s.lowScore, 0) / tripScores.length
-      : 0;
+    const avgHigh =
+      tripScores.length > 0
+        ? tripScores.reduce((sum, s) => sum + s.highScore, 0) / tripScores.length
+        : 0;
+    const avgLow =
+      tripScores.length > 0
+        ? tripScores.reduce((sum, s) => sum + s.lowScore, 0) / tripScores.length
+        : 0;
 
     return {
       tripId: trip.id,
@@ -222,7 +226,7 @@ export async function getTripById(id: string) {
       participantCount: participants.length,
       participants,
       scoreCount: tripScores.length,
-      scores: tripScores.map(score => ({
+      scores: tripScores.map((score) => ({
         id: score.id,
         userId: score.userId,
         userName: score.userName,
