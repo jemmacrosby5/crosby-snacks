@@ -1,7 +1,7 @@
 import Leaderboard from '@components/Leaderboard';
 import Link from 'next/link';
-import StatBoxes from '@/components/StatBoxes'
-
+import StatBoxes from '@/components/StatBoxes';
+export const dynamic = 'force-dynamic';
 
 export default async function Home() {
   return (
@@ -18,8 +18,12 @@ export default async function Home() {
         <p>The current top 5 trips are:</p>
         <Leaderboard limit={5} />
         <div className="flex gap-2">
-          <Link className="bg-slate-600 rounded-md w-fit p-4 text-white" href="/trip">View all trips</Link>
-          <Link className="bg-slate-600 rounded-md w-fit p-4 text-white" href="/rules">View the rules</Link>
+          <Link className="bg-slate-600 rounded-md w-fit p-4 text-white" href="/trip">
+            View all trips
+          </Link>
+          <Link className="bg-slate-600 rounded-md w-fit p-4 text-white" href="/rules">
+            View the rules
+          </Link>
         </div>
       </section>
     </>
