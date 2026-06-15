@@ -6,9 +6,10 @@ interface ButtonProps {
   type: ButtonVariant;
   label: string;
   link: string;
+  customClass?: string;
 }
 
-export default function LinkButton({ type, label, link }: ButtonProps) {
+export default function LinkButton({ type, label, link, customClass }: ButtonProps) {
   const baseClasses = 'rounded-md px-5 py-2 inline-flex items-center justify-center';
   const variantClasses =
     type === 'primary'
@@ -18,7 +19,11 @@ export default function LinkButton({ type, label, link }: ButtonProps) {
         : 'bg-transparent text-primary-green underline underline-offset-4';
 
   return (
-    <Link href={link} className={`${baseClasses} ${variantClasses}`} aria-label={label}>
+    <Link
+      href={link}
+      className={`${baseClasses} ${variantClasses} ${customClass}`}
+      aria-label={label}
+    >
       {label}
     </Link>
   );

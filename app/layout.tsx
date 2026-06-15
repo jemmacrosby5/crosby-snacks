@@ -32,7 +32,7 @@ export default function RootLayout({
           className={`${jakarta.variable} ${inter.variable} antialiased m-0 p-0 flex flex-col min-h-screen`}
         >
           <Header />
-          <main className="flex-1 bg-linear-to-br from-secondary-green via-slate-100 to-primary-blue px-4 md:px-8 lg:p-16">
+          <main className="flex-1 bg-linear-to-br from-secondary-green via-slate-100 to-primary-blue p-4 md:p-8 lg:p-16">
             {children}
           </main>
           <Footer />

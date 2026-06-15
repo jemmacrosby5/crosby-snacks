@@ -18,7 +18,7 @@ export default async function StatBoxes() {
           key={item.key}
           className="rounded-lg shadow-md flex flex-col items-center gap-2 p-8 bg-white"
         >
-          <div className="bg-primary-green p-1 rounded-full w-fit">
+          <div className="bg-primary-coral p-1 rounded-full w-fit">
             <Icon name={item.icon} className="text-white" />
           </div>
           <p className="flex flex-col text-center">
