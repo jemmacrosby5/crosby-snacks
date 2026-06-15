@@ -125,9 +125,9 @@ export const icons = {
         points="88 136 112 160 168 104"
         fill="none"
         stroke="currentColor"
-       stroke-linecap="round"
-        stroke-linejoin="round"
-        stroke-width="16"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="16"
       />
       <circle
         cx="128"
@@ -135,9 +135,9 @@ export const icons = {
         r="96"
         fill="none"
         stroke="currentColor"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        stroke-width="16"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="16"
       />
     </>
   ),
