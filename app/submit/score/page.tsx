@@ -1,6 +1,7 @@
-import { auth } from '@clerk/nextjs/server';
 import LoginCTA from '@/components/LoginCTA';
 import TripDetailsBox from '@components/TripDetailsBox';
+
+import { auth } from '@clerk/nextjs/server';
 import { getAllTrips } from '@db/queries';
 import Link from 'next/link';
 

@@ -44,3 +44,11 @@ export const scores = pgTable('scores', {
   highScore: integer('high_score').notNull(),
   lowScore: integer('low_score').notNull(),
 });
+
+export const clerkMapping = pgTable('clerk_mapping', {
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  userId: text('user_id')
+    .notNull()
+    .references(() => users.id),
+  clerkId: text('clerk_id'),
+});
