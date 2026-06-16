@@ -1,9 +1,12 @@
 import { Icon } from '@/components/Icon';
 import { ScoreCard } from '@/components/ScoreCard';
 import { ProfilePicture } from '@/components/ProfilePicture';
-import { getTripById } from '@db/queries';
 import LinkButton from '@/components/LinkButton';
 import ScoreFormModal from '@/components/ScoreFormModal';
+import LoginCTA from '@/components/LoginCTA';
+
+import { getTripById } from '@db/queries';
+import { auth } from '@clerk/nextjs/server';
 
 interface TripPageProps {
   params: Promise<{
@@ -12,6 +15,11 @@ interface TripPageProps {
 }
 
 const TripPage = async ({ params }: TripPageProps) => {
+  const { isAuthenticated } = await auth();
+
+  if (!isAuthenticated) {
+    return <LoginCTA />;
+  }
   const { id } = await params;
   const tripData = await getTripById(id);
 
