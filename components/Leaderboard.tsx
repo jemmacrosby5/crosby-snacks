@@ -34,7 +34,7 @@ export default async function Leaderboard({ limit }: LeaderboardProps) {
               >
                 {/* Rank */}
                 <div className="flex justify-center">
-                  <div className="rounded-full bg-slate-700 w-8 h-8 text-white text-center flex items-center justify-center">
+                  <div className="rounded-full bg-primary-green w-8 h-8 text-white text-center flex items-center justify-center">
                     {index + 1}
                   </div>
                 </div>

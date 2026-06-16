@@ -1,19 +1,19 @@
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Plus_Jakarta_Sans, Inter } from 'next/font/google';
 import './globals.css';
 import { ClerkProvider } from '@clerk/nextjs';
 
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
+export const jakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
+  variable: '--font-jakarta',
 });
 
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
+export const inter = Inter({
   subsets: ['latin'],
+  variable: '--font-inter',
 });
 
 export const metadata: Metadata = {
@@ -28,12 +28,14 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
-        <body className={`${geistSans.variable} ${geistMono.variable} antialiased m-0 p-0 flex flex-col min-h-screen`}>
+        <body
+          className={`${jakarta.variable} ${inter.variable} antialiased m-0 p-0 flex flex-col min-h-screen`}
+        >
           <Header />
-          <main className="flex-1 bg-linear-to-br from-slate-50 via-slate-100 to-slate-200 px-4 md:px-8 lg:px-16 py-20">
+          <main className="flex-1 bg-linear-to-br from-secondary-green via-slate-100 to-primary-blue p-4 md:p-8 lg:p-16">
             {children}
           </main>
-          <Footer/>
+          <Footer />
         </body>
       </html>
     </ClerkProvider>

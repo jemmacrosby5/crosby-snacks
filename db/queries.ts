@@ -1,5 +1,5 @@
 import { db } from '@/db';
-import { users, trips, tripParticipants, scores, countries } from '@/db/schema';
+import { users, trips, tripParticipants, scores, countries, clerkMapping } from '@/db/schema';
 import { avg, sql, desc, eq, count } from 'drizzle-orm';
 
 // Get Users
@@ -131,27 +131,51 @@ export async function getLeaderBoard() {
   }
 }
 
-// export const trips = pgTable("trips", {
-//   id: integer().primaryKey().generatedAlwaysAsIdentity(),
-//   createdAt: timestamp('created_at').notNull(),
-//   countryId: integer('country_id').notNull().references(() => countries.id),
-//   date: timestamp().notNull(),
-//   description: text()
-// });
+export async function getAllTrips() {
+  try {
+    const tripRows = await db
+      .select({
+        id: trips.id,
+        date: trips.date,
+        description: trips.description,
+        countryName: countries.name,
+        countryCode: countries.code,
+        countryTwoLetterCode: countries.twoLetterCode,
+      })
+      .from(trips)
+      .innerJoin(countries, eq(trips.countryId, countries.id))
+      .orderBy(desc(trips.date));
 
-// export const tripParticipants = pgTable("trip_participants", {
-//   id: integer().primaryKey().generatedAlwaysAsIdentity(),
-//   tripId: integer('trip_id').notNull().references(() => trips.id),
-//   userId: uuid('user_id').notNull().references(() => users.id)
-// });
+    return await Promise.all(
+      tripRows.map(async (trip) => {
+        const participants = await db
+          .select({
+            id: users.id,
+            name: users.name,
+            pictureUrl: users.pictureUrl,
+          })
+          .from(tripParticipants)
+          .innerJoin(users, eq(tripParticipants.userId, users.id))
+          .where(eq(tripParticipants.tripId, trip.id));
 
-// export const scores = pgTable("scores", {
-//   id: integer().primaryKey().generatedAlwaysAsIdentity(),
-//   tripId: integer('trip_id').notNull().references(() => trips.id),
-//   userId: uuid('user_id').notNull().references(() => users.id),
-//   highScore: integer('high_score').notNull(),
-//   lowScore: integer('low_score').notNull()
-// });
+        return {
+          id: trip.id,
+          date: trip.date,
+          description: trip.description,
+          country: {
+            name: trip.countryName,
+            code: trip.countryCode,
+            twoLetterCode: trip.countryTwoLetterCode,
+          },
+          participants,
+        };
+      })
+    );
+  } catch (error) {
+    console.error('Failed to fetch trips:', error);
+    return [];
+  }
+}
 
 // Get a specified trip info
 export async function getTripById(id: string) {
@@ -239,4 +263,14 @@ export async function getTripById(id: string) {
     console.error('Failed to fetch trip:', error);
     return null;
   }
+}
+
+export async function getUserIdByClerkId(clerkId: string) {
+  const [mapping] = await db
+    .select({ userId: clerkMapping.userId })
+    .from(clerkMapping)
+    .where(eq(clerkMapping.clerkId, clerkId))
+    .limit(1);
+
+  return mapping ?? null;
 }

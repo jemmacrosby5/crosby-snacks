@@ -1,8 +1,9 @@
-import { auth } from '@clerk/nextjs/server';
-import { apiFetch } from '@/utils/functions';
-
 import LoginCTA from '@/components/LoginCTA';
-import NewTripForm from '@/components/NewTripForm';
+import TripDetailsBox from '@components/TripDetailsBox';
+
+import { auth } from '@clerk/nextjs/server';
+import { getAllTrips } from '@db/queries';
+import Link from 'next/link';
 
 export default async function Page() {
   const { isAuthenticated } = await auth();
@@ -10,20 +11,25 @@ export default async function Page() {
   if (!isAuthenticated) {
     return <LoginCTA />;
   }
-
-  const fetchedCountries = await apiFetch(`/country/`);
-  const fetchedUsers = await apiFetch(`/user/all`);
-
-  if (!fetchedCountries || !fetchedUsers) {
-    return <p>Oops, sorry, there's been an error!</p>;
-  }
+  const tripsData = await getAllTrips();
 
   return (
     <>
-      <h1 className="text-3xl font-semibold mt-4 text-center">Create a new trip</h1>
-      <p className="text-gray-500 mb-6 text-center">Add trip details and select who joined</p>
-      <div className="min-h-screen flex justify-center">
-        <NewTripForm countries={fetchedCountries} users={fetchedUsers}></NewTripForm>
+      <h1 className="text-3xl font-semibold mt-4 text-center">Submit a Score</h1>
+      <p className="text-gray-500 mb-6 text-center">
+        Which trip would you like to submit a score for?
+      </p>
+
+      <div className="flex flex-wrap gap-4">
+        {tripsData.map((trip) => (
+          <Link
+            href={`/trip/${trip.id}`}
+            key={trip.id}
+            className={`w-full sm:w-[calc(50%-0.5rem)] md:w-[calc(33.333%-0.75rem)] lg:w-[calc(25%-1rem)] bg-white cursor-pointer rounded-md p-4 text-left`}
+          >
+            <TripDetailsBox trip={trip} />
+          </Link>
+        ))}
       </div>
     </>
   );
