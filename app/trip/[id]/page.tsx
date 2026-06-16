@@ -1,9 +1,9 @@
-import Link from 'next/link';
 import { Icon } from '@/components/Icon';
 import { ScoreCard } from '@/components/ScoreCard';
 import { ProfilePicture } from '@/components/ProfilePicture';
 import { getTripById } from '@db/queries';
 import LinkButton from '@/components/LinkButton';
+import ScoreFormModal from '@/components/ScoreFormModal';
 
 interface TripPageProps {
   params: Promise<{
@@ -99,21 +99,20 @@ const TripPage = async ({ params }: TripPageProps) => {
       <div className="w-full mx-auto bg-white rounded-2xl shadow-lg p-8">
         <h2 className="text-2xl font-bold mb-1">Scores</h2>
         <div aria-hidden className="bg-primary-green h-1 w-10 mb-2"></div>
-        {tripData?.scores.length === 0 ? (
-          <div className="flex items-center justify-between bg-gray-50 border rounded-lg p-4">
-            <p className="text-gray-600">No scores yet</p>
-            <Link
-              href="/submit/score"
-              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition"
-            >
-              Submit a score
-            </Link>
+
+        {tripData.scores.length === 0 ? (
+          <div className="flex flex-col rounded-lg mt-4 gap-4">
+            <p>No scores yet, be the first to submit a score!</p>
+            <ScoreFormModal selectedTripId={tripData.tripId} />
           </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {tripData?.scores.map((score) => {
-              return <ScoreCard key={score.id} score={score} />;
-            })}
+            {tripData.scores.map((score) => (
+              <ScoreCard key={score.id} score={score} />
+            ))}
+            <div className="col-span-full md:col-auto">
+              <ScoreFormModal selectedTripId={tripData.tripId} />
+            </div>
           </div>
         )}
       </div>

@@ -1,13 +1,13 @@
-import { db } from '@/db'
-import { avg, sql, desc, eq, count } from 'drizzle-orm'
-import { users, trips, tripParticipants, scores, countries } from '@/db/schema'
+import { db } from '@/db';
+import { avg, sql, desc, eq, count } from 'drizzle-orm';
+import { users, trips, tripParticipants, scores, countries } from '@/db/schema';
 
 // Create new trip
 export async function createTrip(data: {
-  countryId: number
-  description?: string
-  date: string
-  selectedParticipants: string[] | string
+  countryId: number;
+  description?: string;
+  date: string;
+  selectedParticipants: string[] | string;
 }) {
   try {
     // Insert trip
@@ -19,11 +19,11 @@ export async function createTrip(data: {
         date: new Date(data.date),
         createdAt: new Date(),
       })
-      .returning({ id: trips.id })
+      .returning({ id: trips.id });
 
     // Handle participants - ensure it's an array
-    const participants = Array.isArray(data.selectedParticipants) 
-      ? data.selectedParticipants 
+    const participants = Array.isArray(data.selectedParticipants)
+      ? data.selectedParticipants
       : [data.selectedParticipants];
 
     // Insert trip participants
@@ -32,13 +32,34 @@ export async function createTrip(data: {
         await db.insert(tripParticipants).values({
           tripId: newTrip.id,
           userId,
-        })
+        });
       }
     }
 
-    return { success: true, tripId: newTrip.id }
+    return { success: true, tripId: newTrip.id };
   } catch (error) {
-    console.error('Error creating trip:', error)
-    return { success: false, error: 'Failed to create trip' }
+    console.error('Error creating trip:', error);
+    return { success: false, error: 'Failed to create trip' };
+  }
+}
+
+export async function createScore(data: {
+  tripId: number;
+  userId: string;
+  highScore: number;
+  lowScore: number;
+}) {
+  try {
+    await db.insert(scores).values({
+      tripId: data.tripId,
+      userId: data.userId,
+      highScore: data.highScore,
+      lowScore: data.lowScore,
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error('Error creating score:', error);
+    return { success: false, error: 'Failed to create score' };
   }
 }

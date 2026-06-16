@@ -153,6 +153,52 @@ export async function getLeaderBoard() {
 //   lowScore: integer('low_score').notNull()
 // });
 
+export async function getAllTrips() {
+  try {
+    const tripRows = await db
+      .select({
+        id: trips.id,
+        date: trips.date,
+        description: trips.description,
+        countryName: countries.name,
+        countryCode: countries.code,
+        countryTwoLetterCode: countries.twoLetterCode,
+      })
+      .from(trips)
+      .innerJoin(countries, eq(trips.countryId, countries.id))
+      .orderBy(desc(trips.date));
+
+    return await Promise.all(
+      tripRows.map(async (trip) => {
+        const participants = await db
+          .select({
+            id: users.id,
+            name: users.name,
+            pictureUrl: users.pictureUrl,
+          })
+          .from(tripParticipants)
+          .innerJoin(users, eq(tripParticipants.userId, users.id))
+          .where(eq(tripParticipants.tripId, trip.id));
+
+        return {
+          id: trip.id,
+          date: trip.date,
+          description: trip.description,
+          country: {
+            name: trip.countryName,
+            code: trip.countryCode,
+            twoLetterCode: trip.countryTwoLetterCode,
+          },
+          participants,
+        };
+      })
+    );
+  } catch (error) {
+    console.error('Failed to fetch trips:', error);
+    return [];
+  }
+}
+
 // Get a specified trip info
 export async function getTripById(id: string) {
   try {

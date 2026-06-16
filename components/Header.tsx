@@ -1,5 +1,6 @@
 import { SignInButton, SignUpButton, SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
 import { Icon } from '@components/Icon';
+import LinkButton from '@components/LinkButton';
 import Link from 'next/link';
 
 export default function Header() {
@@ -10,7 +11,7 @@ export default function Header() {
         <div className="rounded-full bg-slate-600 p-1">
           <Icon name="cookie" size={40} className="text-white" />
         </div>
-        <h1 className="text-xl font-bold">Crosby Snacks</h1>
+        <h1 className="text-xl font-bold sm:block hidden">Crosby Snacks</h1>
       </Link>
 
       {/* Right: Buttons */}
@@ -22,12 +23,18 @@ export default function Header() {
       </SignedOut>
       <SignedIn>
         <div className="flex gap-4">
-          <Link href="/submit/trip" className="cursor-pointer bg-slate-600 text-white p-2 rounded">
-            Create Trip
-          </Link>
-          <Link href="/submit/score" className="cursor-pointer bg-slate-600 text-white p-2 rounded">
-            Submit Score
-          </Link>
+          <LinkButton
+            type="primary"
+            link="/submit/trip"
+            label="Create Trip"
+            customClass="text-sm w-20 text-center px-2 sm:w-fit sm:text-base"
+          />
+          <LinkButton
+            type="secondary"
+            label="Submit Score"
+            link="/submit/score"
+            customClass="text-sm w-20 text-center px-2 sm:w-fit sm:text-base"
+          />
           <UserButton />
         </div>
       </SignedIn>

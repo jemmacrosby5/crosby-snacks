@@ -1,8 +1,8 @@
 'use client';
 import React, { useState } from 'react';
-import {ProfilePicture} from '@components/ProfilePicture';
+import { ProfilePicture } from '@components/ProfilePicture';
 import { Country, User } from '@utils/types';
-import { createTripAction } from '@/app/actions/createTrip'
+import { createTripAction } from '@/app/actions/createTrip';
 
 type Props = {
   countries: Country[];
@@ -90,7 +90,7 @@ export default function NewTripForm({ countries, users }: Props) {
               );
             })}
             {/* Hidden inputs for selected participants */}
-            {selectedParticipants.map(id => (
+            {selectedParticipants.map((id) => (
               <input key={id} type="hidden" name="participants" value={id} />
             ))}
           </div>
@@ -98,7 +98,7 @@ export default function NewTripForm({ countries, users }: Props) {
 
         <button
           type="submit"
-          className="mt-4 w-full bg-slate-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition"
+          className="bg-primary-green text-white rounded-md px-6 py-2 self-center cursor-pointer"
         >
           Create Trip
         </button>
