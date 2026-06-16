@@ -17,9 +17,6 @@ interface TripPageProps {
 const TripPage = async ({ params }: TripPageProps) => {
   const { isAuthenticated } = await auth();
 
-  if (!isAuthenticated) {
-    return <LoginCTA />;
-  }
   const { id } = await params;
   const tripData = await getTripById(id);
 
@@ -111,16 +108,32 @@ const TripPage = async ({ params }: TripPageProps) => {
         {tripData.scores.length === 0 ? (
           <div className="flex flex-col rounded-lg mt-4 gap-4">
             <p>No scores yet, be the first to submit a score!</p>
-            <ScoreFormModal selectedTripId={tripData.tripId} />
+            {isAuthenticated ? (
+              <div className="col-span-full md:col-auto">
+                <ScoreFormModal selectedTripId={tripData.tripId} />
+              </div>
+            ) : (
+              <div className="rounded-md bg-primary-coral text-white p-2 w-1/4 text-center">
+                Sign in to submit a score!
+              </div>
+            )}
           </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {tripData.scores.map((score) => (
-              <ScoreCard key={score.id} score={score} />
-            ))}
-            <div className="col-span-full md:col-auto">
-              <ScoreFormModal selectedTripId={tripData.tripId} />
+          <div className="flex flex-col gap-8">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {tripData.scores.map((score) => (
+                <ScoreCard key={score.id} score={score} />
+              ))}
             </div>
+            {isAuthenticated ? (
+              <div className="col-span-full md:col-auto">
+                <ScoreFormModal selectedTripId={tripData.tripId} />
+              </div>
+            ) : (
+              <div className="rounded-md bg-primary-coral text-white p-2 w-1/4 text-center">
+                Sign in to submit a score!
+              </div>
+            )}
           </div>
         )}
       </div>

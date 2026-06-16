@@ -1,6 +1,7 @@
 'use client';
 
 import { FormEvent, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface Props {
   selectedTripId: number;
@@ -8,6 +9,7 @@ interface Props {
 }
 
 export default function ScoreForm({ selectedTripId, onSuccess }: Props) {
+  const router = useRouter();
   const [highScore, setHighScore] = useState<number | ''>('');
   const [lowScore, setLowScore] = useState<number | ''>('');
   const [submitting, setSubmitting] = useState(false);
@@ -53,6 +55,8 @@ export default function ScoreForm({ selectedTripId, onSuccess }: Props) {
       setSuccess(true);
       setHighScore('');
       setLowScore('');
+      // Refresh server-rendered data and then call any success handler (e.g., close modal)
+      router.refresh();
       onSuccess?.();
     } catch (err) {
       setError('Unable to submit score. Please try again.');

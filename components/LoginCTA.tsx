@@ -1,46 +1,19 @@
 export default function LoginCTA() {
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        minHeight: '60vh',
-        padding: 16,
-      }}
-    >
-      <div
-        style={{
-          width: '100%',
-          maxWidth: 560,
-          textAlign: 'center',
-          padding: '2rem',
-          borderRadius: 12,
-          boxShadow: '0 8px 30px rgba(2,6,23,0.08)',
-          background: 'white',
-        }}
-      >
-        <div style={{ fontSize: 56, marginBottom: 8 }}>✈️</div>
-        <h2 style={{ margin: '0 0 8px', fontSize: 22 }}>Sign in to submit scores</h2>
-        <p style={{ margin: 0, color: '#374151' }}>
-          Join other travelers — sign in to add your trip scores, track your trips, and appear on
-          the leaderboard.
+    <div className="flex items-center justify-center min-h-[60vh] p-4">
+      <div className="w-full max-w-2xl text-center p-8 rounded-xl shadow-lg bg-white">
+        <div className="text-6xl mb-2">✈️</div>
+        <h2 className="m-0 mb-2 text-xl font-semibold">Sign in to submit scores</h2>
+        <p className="m-0 text-sm text-slate-700">
+          Sign in to add your trip scores, track your trips, and appear on the leaderboard.
         </p>
 
-        <div style={{ marginTop: 20 }}>
+        <div className="mt-5">
           <a
             href="/login"
-            style={{
-              display: 'inline-block',
-              padding: '10px 18px',
-              background: '#111827',
-              color: '#fff',
-              borderRadius: 8,
-              textDecoration: 'none',
-              fontWeight: 600,
-            }}
+            className="inline-block px-4 py-2 bg-primary-green text-white rounded-md font-semibold hover:opacity-90 transition"
           >
-            Sign in / Create account
+            Sign in
           </a>
         </div>
       </div>

@@ -32,7 +32,6 @@ export async function POST(request: Request) {
   });
 
   if (!result.success) {
-    console.log('RESULT', result);
     return NextResponse.json(
       { error: `${result.error} - you may have already voted here.` },
       { status: 500 }

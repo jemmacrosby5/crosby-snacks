@@ -18,9 +18,15 @@ export default function Header() {
 
       {/* Right: Buttons */}
       <SignedOut>
-        <div className="flex justify-between gap-2">
-          <SignInButton>Login</SignInButton>
-          <SignUpButton>Register</SignUpButton>
+        <div className="flex items-center gap-2">
+          <SignInButton>
+            <button
+              type="button"
+              className="bg-primary-green cursor-pointer text-white px-3 py-2 rounded-md font-semibold hover:opacity-95 transition"
+            >
+              Login
+            </button>
+          </SignInButton>
         </div>
       </SignedOut>
       <SignedIn>
