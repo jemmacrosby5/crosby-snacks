@@ -1,6 +1,7 @@
 import { db } from '@/db';
 import { users, trips, tripParticipants, scores, countries, clerkMapping } from '@/db/schema';
 import { avg, sql, desc, eq, count } from 'drizzle-orm';
+import { unstable_cache } from 'next/cache';
 
 // Get Users
 export async function getAllUsers() {
@@ -33,20 +34,14 @@ export async function getUserTrips(userId: string) {
     .where(eq(tripParticipants.userId, userId));
 }
 
-// Get a counts for homepage display
-export async function getStatCounts(): Promise<{
-  trips: number;
-  countries: number;
-  users: number;
-  scores: number;
-}> {
-  try {
-    const tripsCount = await db.select({ count: count() }).from(trips);
-    const uniqueCountriesCount = await db
-      .select({ count: sql<number>`count(distinct ${trips.countryId})` })
-      .from(trips);
-    const usersCount = await db.select({ count: count() }).from(users);
-    const scoreCount = await db.select({ count: count() }).from(scores);
+const getStatCountsCached = unstable_cache(
+  async () => {
+    const [tripsCount, uniqueCountriesCount, usersCount, scoreCount] = await Promise.all([
+      db.select({ count: count() }).from(trips),
+      db.select({ count: sql<number>`count(distinct ${trips.countryId})` }).from(trips),
+      db.select({ count: count() }).from(users),
+      db.select({ count: count() }).from(scores),
+    ]);
 
     return {
       trips: Number(tripsCount[0].count),
@@ -54,6 +49,20 @@ export async function getStatCounts(): Promise<{
       users: Number(usersCount[0].count),
       scores: Number(scoreCount[0].count),
     };
+  },
+  ['stat-counts'],
+  { revalidate: 600 }
+);
+
+// Get counts for homepage display
+export async function getStatCounts(): Promise<{
+  trips: number;
+  countries: number;
+  users: number;
+  scores: number;
+}> {
+  try {
+    return await getStatCountsCached();
   } catch (error) {
     console.error('Failed to fetch stats:', error);
     return { trips: 0, countries: 0, users: 0, scores: 0 };
