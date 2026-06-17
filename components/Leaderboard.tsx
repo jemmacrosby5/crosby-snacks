@@ -11,10 +11,7 @@ interface LeaderboardProps {
 
 export default async function Leaderboard({ limit }: LeaderboardProps) {
   let scores: LeaderboardEntry[] = [];
-
-  console.time('leaderboard');
   scores = await getLeaderBoard();
-  console.timeEnd('leaderboard');
 
   // Temp logic to filter to 5, once we've done more trips this logic should be server side
   if (limit) {
