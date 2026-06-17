@@ -113,7 +113,7 @@ const TripPage = async ({ params }: TripPageProps) => {
                 <ScoreFormModal selectedTripId={tripData.tripId} />
               </div>
             ) : (
-              <div className="rounded-md bg-primary-coral text-white p-2 w-1/4 text-center">
+              <div className="rounded-md bg-primary-coral text-white p-2 w-full md:w-1/4 text-center">
                 Sign in to submit a score!
               </div>
             )}
@@ -130,7 +130,7 @@ const TripPage = async ({ params }: TripPageProps) => {
                 <ScoreFormModal selectedTripId={tripData.tripId} />
               </div>
             ) : (
-              <div className="rounded-md bg-primary-coral text-white p-2 w-1/4 text-center">
+              <div className="rounded-md bg-primary-coral text-white p-2 w-full md:w-1/4 text-center">
                 Sign in to submit a score!
               </div>
             )}

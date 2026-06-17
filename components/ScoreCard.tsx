@@ -21,11 +21,11 @@ export function ScoreCard({ score }: Props) {
       </div>
 
       <div className="grid grid-cols-2 bg-gray-100 rounded divide-x divide-gray-300 p-2 justify-between">
-        <div className="p-2 min-w-20 flex flex-col items-center text-primary-green font-semibold">
+        <div className="p-2 md:min-w-20 flex flex-col items-center text-primary-green font-semibold">
           <p>High</p>
           <p className="text-xl">{score.highScore}</p>
         </div>
-        <div className="p-2 min-w-20 flex flex-col items-center text-primary-coral font-semibold">
+        <div className="p-2 md:min-w-20 flex flex-col items-center text-primary-coral font-semibold">
           <p>Low</p>
           <p className="text-xl">{score.lowScore}</p>
         </div>
