@@ -34,12 +34,9 @@ export async function getUserTrips(userId: string) {
 }
 
 // Get counts for homepage display
+
 export async function getStatCounts() {
-  const [tripsCount, usersCount, scoresCount] = await Promise.all([
-    db.$count(trips),
-    db.$count(users),
-    db.$count(scores),
-  ]);
+  const tripCount = await db.$count(trips);
 
   const [{ countriesCount }] = await db
     .select({
@@ -48,10 +45,10 @@ export async function getStatCounts() {
     .from(trips);
 
   return {
-    trips: tripsCount,
-    users: usersCount,
-    scores: scoresCount,
-    countries: Number(countriesCount ?? 0),
+    trips: tripCount,
+    countries: countriesCount,
+    users: 0,
+    scores: 0,
   };
 }
 
