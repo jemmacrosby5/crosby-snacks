@@ -35,27 +35,25 @@ export async function getUserTrips(userId: string) {
 
 // Get counts for homepage display
 export async function getStatCounts() {
-  const [stats] = await db.execute<{
-    trips: number;
-    countries: number;
-    users: number;
-    scores: number;
-  }>(sql`
-    select
-      (select count(*) from trips) as trips,
-      (select count(distinct trips.country_id) from trips) as countries,
-      (select count(*) from users) as users,
-      (select count(*) from scores) as scores
-  `);
+  const [tripsCount, usersCount, scoresCount] = await Promise.all([
+    db.$count(trips),
+    db.$count(users),
+    db.$count(scores),
+  ]);
+
+  const countries = await db
+    .selectDistinct({
+      countryId: trips.countryId,
+    })
+    .from(trips);
 
   return {
-    trips: Number(stats?.trips ?? 0),
-    countries: Number(stats?.countries ?? 0),
-    users: Number(stats?.users ?? 0),
-    scores: Number(stats?.scores ?? 0),
+    trips: tripsCount,
+    users: usersCount,
+    scores: scoresCount,
+    countries: countries.length,
   };
 }
-
 export async function getLeaderBoard(limit?: number) {
   try {
     const leaderboardQuery = db
