@@ -34,36 +34,53 @@ export async function getUserTrips(userId: string) {
 }
 
 // Get counts for homepage display
-export async function getStatCounts(): Promise<{
-  trips: number;
-  countries: number;
-  users: number;
-  scores: number;
-}> {
-  try {
-    const [stats] = await db.execute<{
-      trips: number;
-      countries: number;
-      users: number;
-      scores: number;
-    }>(sql`
-      select
-        (select count(*) from ${trips}) as trips,
-        (select count(distinct ${trips.countryId}) from ${trips}) as countries,
-        (select count(*) from ${users}) as users,
-        (select count(*) from ${scores}) as scores
-    `);
+// export async function getStatCounts(): Promise<{
+//   trips: number;
+//   countries: number;
+//   users: number;
+//   scores: number;
+// }> {
+//   try {
+//     const [stats] = await db.execute<{
+//       trips: number;
+//       countries: number;
+//       users: number;
+//       scores: number;
+//     }>(sql`
+//       select
+//         (select count(*) from ${trips}) as trips,
+//         (select count(distinct ${trips.countryId}) from ${trips}) as countries,
+//         (select count(*) from ${users}) as users,
+//         (select count(*) from ${scores}) as scores
+//     `);
 
-    return {
-      trips: Number(stats?.trips ?? 0),
-      countries: Number(stats?.countries ?? 0),
-      users: Number(stats?.users ?? 0),
-      scores: Number(stats?.scores ?? 0),
-    };
-  } catch (error) {
-    console.error('Failed to fetch stats:', error);
-    return { trips: 0, countries: 0, users: 0, scores: 0 };
-  }
+//     return {
+//       trips: Number(stats?.trips ?? 0),
+//       countries: Number(stats?.countries ?? 0),
+//       users: Number(stats?.users ?? 0),
+//       scores: Number(stats?.scores ?? 0),
+//     };
+//   } catch (error) {
+//     console.error('Failed to fetch stats:', error);
+//     return { trips: 0, countries: 0, users: 0, scores: 0 };
+//   }
+// }
+
+export async function getStatCounts() {
+  console.log('before query');
+
+  const result = await db.execute(sql`
+    select 1 as test
+  `);
+
+  console.log('after query');
+
+  return {
+    trips: 1,
+    countries: 1,
+    users: 1,
+    scores: 1,
+  };
 }
 
 export async function getLeaderBoard(limit?: number) {
