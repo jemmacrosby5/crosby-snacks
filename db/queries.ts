@@ -34,46 +34,24 @@ export async function getUserTrips(userId: string) {
 }
 
 // Get counts for homepage display
-// export async function getStatCounts(): Promise<{
-//   trips: number;
-//   countries: number;
-//   users: number;
-//   scores: number;
-// }> {
-//   try {
-//     const [stats] = await db.execute<{
-//       trips: number;
-//       countries: number;
-//       users: number;
-//       scores: number;
-//     }>(sql`
-//       select
-//         (select count(*) from ${trips}) as trips,
-//         (select count(distinct ${trips.countryId}) from ${trips}) as countries,
-//         (select count(*) from ${users}) as users,
-//         (select count(*) from ${scores}) as scores
-//     `);
-
-//     return {
-//       trips: Number(stats?.trips ?? 0),
-//       countries: Number(stats?.countries ?? 0),
-//       users: Number(stats?.users ?? 0),
-//       scores: Number(stats?.scores ?? 0),
-//     };
-//   } catch (error) {
-//     console.error('Failed to fetch stats:', error);
-//     return { trips: 0, countries: 0, users: 0, scores: 0 };
-//   }
-// }
-
 export async function getStatCounts() {
-  const tripCount = await db.$count(trips);
+  const [tripsCount, usersCount, scoresCount] = await Promise.all([
+    db.$count(trips),
+    db.$count(users),
+    db.$count(scores),
+  ]);
+
+  const [{ countriesCount }] = await db
+    .select({
+      countriesCount: sql<number>`count(distinct ${trips.countryId})`,
+    })
+    .from(trips);
 
   return {
-    trips: tripCount,
-    countries: 0,
-    users: 0,
-    scores: 0,
+    trips: tripsCount,
+    users: usersCount,
+    scores: scoresCount,
+    countries: Number(countriesCount ?? 0),
   };
 }
 
