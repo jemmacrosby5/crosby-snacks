@@ -67,20 +67,13 @@ export async function getUserTrips(userId: string) {
 // }
 
 export async function getStatCounts() {
-  console.log('before query');
-
-  const result = await db.execute(sql`
-  select
-    (select count(*) from ${trips}) as trips
-`);
-
-  console.log('after query');
+  const tripCount = await db.$count(trips);
 
   return {
-    trips: 1,
-    countries: 1,
-    users: 1,
-    scores: 1,
+    trips: tripCount,
+    countries: 0,
+    users: 0,
+    scores: 0,
   };
 }
 
