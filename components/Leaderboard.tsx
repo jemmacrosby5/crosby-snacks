@@ -10,13 +10,7 @@ interface LeaderboardProps {
 }
 
 export default async function Leaderboard({ limit }: LeaderboardProps) {
-  let scores: LeaderboardEntry[] = [];
-  scores = await getLeaderBoard();
-
-  // Temp logic to filter to 5, once we've done more trips this logic should be server side
-  if (limit) {
-    scores = scores.slice(0, limit);
-  }
+  const scores: LeaderboardEntry[] = await getLeaderBoard(limit);
 
   return (
     <div className="max-w-3xl mx-auto">

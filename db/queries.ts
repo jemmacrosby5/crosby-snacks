@@ -1,6 +1,6 @@
 import { db } from '@/db';
 import { users, trips, tripParticipants, scores, countries, clerkMapping } from '@/db/schema';
-import { avg, sql, desc, eq, count } from 'drizzle-orm';
+import { avg, sql, desc, eq, inArray } from 'drizzle-orm';
 
 // Get Users
 export async function getAllUsers() {
@@ -66,9 +66,9 @@ export async function getStatCounts(): Promise<{
   }
 }
 
-export async function getLeaderBoard() {
+export async function getLeaderBoard(limit?: number) {
   try {
-    const leaderboard = await db
+    const leaderboardQuery = db
       .select({
         tripId: trips.id,
         date: trips.date,
@@ -98,39 +98,52 @@ export async function getLeaderBoard() {
       )
       .orderBy(desc(sql`AVG(${scores.highScore}) - AVG(${scores.lowScore})`));
 
-    return await Promise.all(
-      leaderboard.map(async (trip) => {
-        const participants = await db
+    const leaderboard = limit ? await leaderboardQuery.limit(limit) : await leaderboardQuery;
+
+    const tripIds = leaderboard.map((trip) => trip.tripId);
+    const participantRows = tripIds.length
+      ? await db
           .select({
+            tripId: tripParticipants.tripId,
             id: users.id,
             name: users.name,
             pictureUrl: users.pictureUrl,
           })
           .from(tripParticipants)
           .innerJoin(users, eq(tripParticipants.userId, users.id))
-          .where(eq(tripParticipants.tripId, trip.tripId));
+          .where(inArray(tripParticipants.tripId, tripIds))
+      : [];
 
-        const avgHigh = Number(trip.avgHigh);
-        const avgLow = Number(trip.avgLow);
-        const avgDiff = avgHigh - avgLow;
+    const participantsByTrip = new Map<number, typeof participantRows>();
 
-        return {
-          tripId: trip.tripId,
-          date: trip.date,
-          description: trip.description,
-          country: {
-            name: trip.countryName,
-            code: trip.countryCode,
-            twoLetterCode: trip.countryTwoLetterCode,
-          },
-          avgHigh,
-          avgLow,
-          avgDiff,
-          scoreCount: participants.length,
-          participants,
-        };
-      })
-    );
+    for (const participant of participantRows) {
+      const existingParticipants = participantsByTrip.get(participant.tripId) ?? [];
+      existingParticipants.push(participant);
+      participantsByTrip.set(participant.tripId, existingParticipants);
+    }
+
+    return leaderboard.map((trip) => {
+      const participants = participantsByTrip.get(trip.tripId) ?? [];
+      const avgHigh = Number(trip.avgHigh);
+      const avgLow = Number(trip.avgLow);
+      const avgDiff = avgHigh - avgLow;
+
+      return {
+        tripId: trip.tripId,
+        date: trip.date,
+        description: trip.description,
+        country: {
+          name: trip.countryName,
+          code: trip.countryCode,
+          twoLetterCode: trip.countryTwoLetterCode,
+        },
+        avgHigh,
+        avgLow,
+        avgDiff,
+        scoreCount: participants.length,
+        participants,
+      };
+    });
   } catch (error) {
     console.error('Failed to fetch users:', error);
     return [];
