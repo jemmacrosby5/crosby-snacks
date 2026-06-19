@@ -70,8 +70,9 @@ export async function getStatCounts() {
   console.log('before query');
 
   const result = await db.execute(sql`
-    select 1 as test
-  `);
+  select
+    (select count(*) from ${trips}) as trips
+`);
 
   console.log('after query');
 
