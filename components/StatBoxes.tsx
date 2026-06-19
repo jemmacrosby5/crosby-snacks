@@ -2,11 +2,7 @@ import { Icon } from '@components/Icon';
 import { getStatCounts } from '@db/queries';
 
 export default async function StatBoxes() {
-  console.time('stats');
-
   const stats = await getStatCounts();
-
-  console.timeEnd('stats');
 
   const statItems = [
     { key: 'trips', label: 'Trips', icon: 'plane', colour: 'blue' },

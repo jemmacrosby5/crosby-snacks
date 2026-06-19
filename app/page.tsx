@@ -12,7 +12,7 @@ export default async function Home() {
           <br />
           <span className="text-primary-green">around the world.</span>
         </h2>
-        {/* <StatBoxes /> */}
+        <StatBoxes />
       </section>
 
       <section className="flex flex-col gap-3 items-center mt-16">

@@ -1,7 +1,6 @@
 import { db } from '@/db';
 import { users, trips, tripParticipants, scores, countries, clerkMapping } from '@/db/schema';
 import { avg, sql, desc, eq, count } from 'drizzle-orm';
-import { unstable_cache } from 'next/cache';
 
 // Get Users
 export async function getAllUsers() {
@@ -34,26 +33,6 @@ export async function getUserTrips(userId: string) {
     .where(eq(tripParticipants.userId, userId));
 }
 
-const getStatCountsCached = unstable_cache(
-  async () => {
-    const [tripsCount, uniqueCountriesCount, usersCount, scoreCount] = await Promise.all([
-      db.select({ count: count() }).from(trips),
-      db.select({ count: sql<number>`count(distinct ${trips.countryId})` }).from(trips),
-      db.select({ count: count() }).from(users),
-      db.select({ count: count() }).from(scores),
-    ]);
-
-    return {
-      trips: Number(tripsCount[0].count),
-      countries: Number(uniqueCountriesCount[0].count),
-      users: Number(usersCount[0].count),
-      scores: Number(scoreCount[0].count),
-    };
-  },
-  ['stat-counts'],
-  { revalidate: 600 }
-);
-
 // Get counts for homepage display
 export async function getStatCounts(): Promise<{
   trips: number;
@@ -62,7 +41,25 @@ export async function getStatCounts(): Promise<{
   scores: number;
 }> {
   try {
-    return await getStatCountsCached();
+    const [stats] = await db.execute<{
+      trips: number;
+      countries: number;
+      users: number;
+      scores: number;
+    }>(sql`
+      select
+        (select count(*) from ${trips}) as trips,
+        (select count(distinct ${trips.countryId}) from ${trips}) as countries,
+        (select count(*) from ${users}) as users,
+        (select count(*) from ${scores}) as scores
+    `);
+
+    return {
+      trips: Number(stats?.trips ?? 0),
+      countries: Number(stats?.countries ?? 0),
+      users: Number(stats?.users ?? 0),
+      scores: Number(stats?.scores ?? 0),
+    };
   } catch (error) {
     console.error('Failed to fetch stats:', error);
     return { trips: 0, countries: 0, users: 0, scores: 0 };
