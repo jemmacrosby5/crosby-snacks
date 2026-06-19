@@ -20,7 +20,7 @@ export default async function Home() {
         <div aria-hidden className="bg-primary-coral h-1 w-10"></div>
         <p>The current top 5 trips are:</p>
 
-        <Leaderboard limit={5} />
+        {/* <Leaderboard limit={5} /> */}
 
         <div className="flex gap-4 my-4 md:flex-row flex-col">
           <LinkButton type="primary" label="View all trips" link="/trip" />
