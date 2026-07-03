@@ -1,6 +1,5 @@
 import { db } from '@/db';
-import { avg, sql, desc, eq, count } from 'drizzle-orm';
-import { users, trips, tripParticipants, scores, countries } from '@/db/schema';
+import { trips, tripParticipants, scores } from '@/db/schema';
 
 // Create new trip
 export async function createTrip(data: {

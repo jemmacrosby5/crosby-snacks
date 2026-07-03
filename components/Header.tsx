@@ -12,7 +12,7 @@ export default function Header() {
       {/* Left: Title */}
       <Link href="/" className="text-xl font-semibold flex items-center">
         <Image src={logo} alt="cat-logo" className="h-14 w-auto" />
-        <h1 className="text-xl font-bold sm:block hidden text-pretty">Crosby Snacks</h1>
+        <h1 className="text-xl font-bold text-pretty">Crosby Snacks</h1>
       </Link>
 
       {/* Right: Buttons */}

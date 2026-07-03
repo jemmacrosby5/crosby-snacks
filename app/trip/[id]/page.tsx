@@ -3,10 +3,11 @@ import { ScoreCard } from '@/components/ScoreCard';
 import { ProfilePicture } from '@/components/ProfilePicture';
 import LinkButton from '@/components/LinkButton';
 import ScoreFormModal from '@/components/ScoreFormModal';
-import LoginCTA from '@/components/LoginCTA';
+import UploadPhotoModal from '@components/UploadPhotoModal';
 
 import { getTripById } from '@db/queries';
 import { auth } from '@clerk/nextjs/server';
+import { SignInButton } from '@clerk/nextjs';
 
 interface TripPageProps {
   params: Promise<{
@@ -19,7 +20,7 @@ const TripPage = async ({ params }: TripPageProps) => {
 
   const { id } = await params;
   const tripData = await getTripById(id);
-  const hasPhotos = !!tripData?.photos;
+  const hasPhotos = !!tripData?.photos && tripData?.photos?.length > 0;
 
   if (!tripData) {
     return (
@@ -114,9 +115,12 @@ const TripPage = async ({ params }: TripPageProps) => {
                 <ScoreFormModal selectedTripId={tripData.tripId} />
               </div>
             ) : (
-              <div className="rounded-md bg-primary-coral text-white p-2 w-full md:w-1/4 text-center">
-                Sign in to submit a score!
-              </div>
+              <SignInButton>
+                <button className="rounded-md bg-primary-coral cursor-pointer text-white px-4 py-2 w-full md:w-fit text-center flex gap-2 items-center">
+                  <Icon name="plusSquare" size={20} className="text-white" />
+                  Sign in to submit a score
+                </button>
+              </SignInButton>
             )}
           </div>
         ) : (
@@ -131,9 +135,12 @@ const TripPage = async ({ params }: TripPageProps) => {
                 <ScoreFormModal selectedTripId={tripData.tripId} />
               </div>
             ) : (
-              <div className="rounded-md bg-primary-coral text-white p-2 w-full md:w-1/4 text-center">
-                Sign in to submit a score!
-              </div>
+              <SignInButton>
+                <button className="rounded-md bg-primary-coral cursor-pointer text-white px-4 py-2 w-full md:w-fit text-center flex gap-2 items-center">
+                  <Icon name="plusSquare" size={20} className="text-white" />
+                  Sign in to submit a score
+                </button>
+              </SignInButton>
             )}
           </div>
         )}
@@ -145,28 +152,36 @@ const TripPage = async ({ params }: TripPageProps) => {
         <div aria-hidden className="bg-primary-green h-1 w-10 mb-2"></div>
 
         {hasPhotos ? (
-          tripData.photos.map((photo) => {
-            return (
-              <div key={photo.id} className="inline-block mr-4 mb-4">
-                <img
-                  src={photo.photoUrl}
-                  alt={photo.userName ?? 'trip photo'}
-                  className="max-w-xs rounded-md shadow-sm object-cover"
-                />
-                <p className="text-sm text-gray-500 mt-1">{photo.userName}</p>
-              </div>
-            );
-          })
+          <div className="flex flex-wrap gap-4">
+            {tripData.photos.map((photo) => {
+              return (
+                <div key={photo.id} className="inline-block mr-4 mb-4">
+                  <img
+                    src={photo.photoUrl}
+                    alt={photo.userName ?? 'trip photo'}
+                    loading="lazy"
+                    decoding="async"
+                    className="max-w-xs rounded-md shadow-sm object-cover max-h-60"
+                  />
+                  <p className=" text-gray-500 mt-1">{photo.userName}</p>
+                </div>
+              );
+            })}
+          </div>
         ) : (
           <p className="text-gray-600 my-4">No photos yet.</p>
         )}
-
         {isAuthenticated ? (
-          <div className="col-span-full md:col-auto">{/* photouploadmodal */}</div>
-        ) : (
-          <div className="rounded-md bg-primary-coral text-white p-2 w-full md:w-1/4 text-center">
-            Sign in to submit a photo!
+          <div className="col-span-full md:col-auto">
+            <UploadPhotoModal selectedTripId={tripData.tripId} />
           </div>
+        ) : (
+          <SignInButton>
+            <button className="rounded-md bg-primary-coral cursor-pointer text-white px-4 py-2 w-full md:w-fit text-center flex gap-2 items-center">
+              <Icon name="camera" size={20} className="text-white" />
+              Sign in to upload a photo
+            </button>
+          </SignInButton>
         )}
       </div>
     </div>
