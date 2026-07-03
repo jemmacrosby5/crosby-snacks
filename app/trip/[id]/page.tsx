@@ -19,6 +19,7 @@ const TripPage = async ({ params }: TripPageProps) => {
 
   const { id } = await params;
   const tripData = await getTripById(id);
+  const hasPhotos = !!tripData?.photos;
 
   if (!tripData) {
     return (
@@ -134,6 +135,37 @@ const TripPage = async ({ params }: TripPageProps) => {
                 Sign in to submit a score!
               </div>
             )}
+          </div>
+        )}
+      </div>
+
+      {/* Pictures */}
+      <div className="w-full mx-auto bg-white rounded-2xl shadow-lg p-8">
+        <h2 className="text-2xl font-bold mb-1">Photos</h2>
+        <div aria-hidden className="bg-primary-green h-1 w-10 mb-2"></div>
+
+        {hasPhotos ? (
+          tripData.photos.map((photo) => {
+            return (
+              <div key={photo.id} className="inline-block mr-4 mb-4">
+                <img
+                  src={photo.photoUrl}
+                  alt={photo.userName ?? 'trip photo'}
+                  className="max-w-xs rounded-md shadow-sm object-cover"
+                />
+                <p className="text-sm text-gray-500 mt-1">{photo.userName}</p>
+              </div>
+            );
+          })
+        ) : (
+          <p className="text-gray-600 my-4">No photos yet.</p>
+        )}
+
+        {isAuthenticated ? (
+          <div className="col-span-full md:col-auto">{/* photouploadmodal */}</div>
+        ) : (
+          <div className="rounded-md bg-primary-coral text-white p-2 w-full md:w-1/4 text-center">
+            Sign in to submit a photo!
           </div>
         )}
       </div>

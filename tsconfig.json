@@ -37,6 +37,9 @@
       ],
       "@actions/*":[
         "./actions/*"
+      ],
+      "@assets/*":[
+        "./assets/*"
       ]
     }
   },

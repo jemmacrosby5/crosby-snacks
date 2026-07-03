@@ -1,5 +1,13 @@
 import { db } from '@/db';
-import { users, trips, tripParticipants, scores, countries, clerkMapping } from '@/db/schema';
+import {
+  users,
+  trips,
+  tripParticipants,
+  scores,
+  countries,
+  photos,
+  clerkMapping,
+} from '@/db/schema';
 import { avg, sql, desc, eq, inArray } from 'drizzle-orm';
 
 // Get Users
@@ -232,6 +240,18 @@ export async function getTripById(id: string) {
       .innerJoin(users, eq(scores.userId, users.id))
       .where(eq(scores.tripId, tripId));
 
+    // Get all photos for this trip with uploader's name
+    const tripPhotos = await db
+      .select({
+        id: photos.id,
+        userId: photos.userId,
+        photoUrl: photos.photoUrl,
+        userName: users.name,
+      })
+      .from(photos)
+      .innerJoin(users, eq(photos.userId, users.id))
+      .where(eq(photos.tripId, tripId));
+
     const trip = tripData[0];
     const avgHigh =
       tripScores.length > 0
@@ -264,6 +284,12 @@ export async function getTripById(id: string) {
         userPic: score.userPic,
         highScore: score.highScore,
         lowScore: score.lowScore,
+      })),
+      photos: tripPhotos.map((p) => ({
+        id: p.id,
+        userId: p.userId,
+        userName: p.userName,
+        photoUrl: p.photoUrl,
       })),
     };
   } catch (error) {

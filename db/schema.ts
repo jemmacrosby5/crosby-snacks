@@ -52,3 +52,14 @@ export const clerkMapping = pgTable('clerk_mapping', {
     .references(() => users.id),
   clerkId: text('clerk_id'),
 });
+
+export const photos = pgTable('photos', {
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  tripId: integer('trip_id')
+    .notNull()
+    .references(() => trips.id),
+  userId: text('user_id')
+    .notNull()
+    .references(() => users.id),
+  photoUrl: text('photo_url').notNull(),
+});

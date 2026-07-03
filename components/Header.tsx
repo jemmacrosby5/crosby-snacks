@@ -1,19 +1,18 @@
 'use client';
 
-import { SignInButton, SignUpButton, SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
-import { Icon } from '@components/Icon';
+import { SignInButton, SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
 import LinkButton from '@components/LinkButton';
 import Link from 'next/link';
+import Image from 'next/image';
+import logo from '../app/assets/logo.svg';
 
 export default function Header() {
   return (
     <header className="w-full px-6 py-4 flex items-center justify-between bg-primary-blue shadow">
       {/* Left: Title */}
-      <Link href="/" className="text-xl font-semibold flex items-center gap-2">
-        <div className="rounded-full bg-slate-600 p-1">
-          <Icon name="cookie" size={40} className="text-white" />
-        </div>
-        <h1 className="text-xl font-bold sm:block hidden">Crosby Snacks</h1>
+      <Link href="/" className="text-xl font-semibold flex items-center">
+        <Image src={logo} alt="cat-logo" className="h-14 w-auto" />
+        <h1 className="text-xl font-bold sm:block hidden text-pretty">Crosby Snacks</h1>
       </Link>
 
       {/* Right: Buttons */}
